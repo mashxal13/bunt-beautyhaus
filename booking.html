@@ -54,36 +54,36 @@
 
     <div class="max-w-2xl mx-auto my-10 bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
         <a href="index.html" class="inline-flex items-center text-xs text-emerald-400 hover:underline mb-6">
-            <i class="fa-solid fa-arrow-left mr-2"></i> Zurück zur Startseite
+            <i class="fa-solid fa-arrow-left mr-2"></i> <span data-i18n="backHome">Zurück zur Startseite</span>
         </a>
         
-        <h1 class="text-3xl font-serif font-bold text-white mb-2">Termin vereinbaren</h1>
-        <p class="text-xs text-zinc-400 mb-8">Wählen Sie Ihre Behandlung, eine/n Mitarbeiter/in und eine verfügbare Uhrzeit.</p>
+        <h1 class="text-3xl font-serif font-bold text-white mb-2" data-i18n="bookTitle">Termin vereinbaren</h1>
+        <p class="text-xs text-zinc-400 mb-8" data-i18n="bookSubtitle">Wählen Sie Ihre Behandlung, eine/n Mitarbeiter/in und eine verfügbare Uhrzeit.</p>
 
         <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4">
             <div>
-                <label class="block text-xs font-medium text-zinc-400 mb-1">Leistung auswählen</label>
+                <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblService">Leistung auswählen</label>
                 <select id="bookingService" required onchange="onServiceChange()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
-                    <option value="">-- Leistung wählen --</option>
+                    <option value="" data-i18n="optService">-- Leistung wählen --</option>
                 </select>
             </div>
 
             <div>
-                <label class="block text-xs font-medium text-zinc-400 mb-1">Mitarbeiter/in</label>
+                <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblEmployee">Mitarbeiter/in</label>
                 <select id="bookingEmployee" required onchange="updateAvailableTimes()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
-                    <option value="">-- Zuerst Leistung wählen --</option>
+                    <option value="" data-i18n="optEmployee">-- Zuerst Leistung wählen --</option>
                 </select>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-medium text-zinc-400 mb-1">Wunschdatum</label>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblDate">Wunschdatum</label>
                     <input type="date" id="bookingDate" required onchange="updateAvailableTimes()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-zinc-400 mb-1">Freier Uhrzeit-Slot</label>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblTime">Freier Uhrzeit-Slot</label>
                     <select id="bookingTime" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
-                        <option value="">-- Datum wählen --</option>
+                        <option value="" data-i18n="optTime">-- Datum wählen --</option>
                     </select>
                 </div>
             </div>
@@ -91,22 +91,22 @@
             <hr class="border-zinc-800 my-4">
 
             <div>
-                <label class="block text-xs font-medium text-zinc-400 mb-1">Ihr Name</label>
-                <input type="text" id="clientName" required placeholder="Vor- und Nachname" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblName">Ihr Name</label>
+                <input type="text" id="clientName" required placeholder="Vor- und Nachname" data-i18n-ph="phName" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-medium text-zinc-400 mb-1">Telefonnummer</label>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblPhone">Telefonnummer</label>
                     <input type="tel" id="clientPhone" required placeholder="+49 ..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-zinc-400 mb-1">E-Mail</label>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblEmail">E-Mail</label>
                     <input type="email" id="clientEmail" required placeholder="name@example.com" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
                 </div>
             </div>
 
-            <button type="submit" id="submitBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold py-3.5 rounded-2xl transition-all mt-6">
+            <button type="submit" id="submitBtn" data-i18n="submitBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold py-3.5 rounded-2xl transition-all mt-6">
                 Termin verbindlich anfragen
             </button>
         </form>
@@ -115,14 +115,37 @@
             <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl border border-emerald-500/20">
                 <i class="fa-solid fa-check"></i>
             </div>
-            <h2 class="text-2xl font-serif font-bold text-white mb-2">Vielen Dank!</h2>
-            <p class="text-xs text-zinc-400 mb-6">Ihre Terminanfrage wurde erfolgreich übermittelt. Sie erhalten in Kürze eine Bestätigung per E-Mail.</p>
-            <a href="index.html" class="inline-block px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-xl">Zurück zur Startseite</a>
+            <h2 class="text-2xl font-serif font-bold text-white mb-2" data-i18n="thankYou">Vielen Dank!</h2>
+            <p class="text-xs text-zinc-400 mb-6" data-i18n="thankYouSub">Ihre Terminanfrage wurde erfolgreich übermittelt. Sie erhalten in Kürze eine Bestätigung per E-Mail.</p>
+            <a href="index.html" class="inline-block px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-xl" data-i18n="backHome">Zurück zur Startseite</a>
         </div>
     </div>
 
     <script>
         let storeData = JSON.parse(localStorage.getItem('buntBeautyData')) || { services: [], employees: [], bookings: [], blockedPeriods: [], extraSlots: [] };
+
+        // --- Booking page translations ---
+        const bookingTranslations = {
+            de: { backHome:"Zurück zur Startseite", bookTitle:"Termin vereinbaren", bookSubtitle:"Wählen Sie Ihre Behandlung, eine/n Mitarbeiter/in und eine verfügbare Uhrzeit.", lblService:"Leistung auswählen", optService:"-- Leistung wählen --", lblEmployee:"Mitarbeiter/in", optEmployee:"-- Zuerst Leistung wählen --", lblDate:"Wunschdatum", lblTime:"Freier Uhrzeit-Slot", optTime:"-- Datum wählen --", lblName:"Ihr Name", phName:"Vor- und Nachname", lblPhone:"Telefonnummer", lblEmail:"E-Mail", submitBtn:"Termin verbindlich anfragen", thankYou:"Vielen Dank!", thankYouSub:"Ihre Terminanfrage wurde erfolgreich übermittelt. Sie erhalten in Kürze eine Bestätigung per E-Mail.", vacationMsg:"An diesem Tag ist Urlaub / geschlossen. Bitte wählen Sie ein anderes Datum." },
+            en: { backHome:"Back to Home", bookTitle:"Book an Appointment", bookSubtitle:"Choose your treatment, a staff member and an available time.", lblService:"Select service", optService:"-- Choose service --", lblEmployee:"Staff member", optEmployee:"-- Choose service first --", lblDate:"Preferred date", lblTime:"Available time slot", optTime:"-- Choose date --", lblName:"Your name", phName:"First and last name", lblPhone:"Phone number", lblEmail:"E-Mail", submitBtn:"Request appointment", thankYou:"Thank you!", thankYouSub:"Your appointment request was sent successfully. You will receive a confirmation by e-mail shortly.", vacationMsg:"This day is closed / on holiday. Please choose another date." },
+            ru: { backHome:"На главную", bookTitle:"Записаться на приём", bookSubtitle:"Выберите услугу, сотрудника и свободное время.", lblService:"Выберите услугу", optService:"-- Выберите услугу --", lblEmployee:"Сотрудник", optEmployee:"-- Сначала выберите услугу --", lblDate:"Желаемая дата", lblTime:"Свободное время", optTime:"-- Выберите дату --", lblName:"Ваше имя", phName:"Имя и фамилия", lblPhone:"Телефон", lblEmail:"E-Mail", submitBtn:"Записаться", thankYou:"Спасибо!", thankYouSub:"Ваша заявка успешно отправлена. В ближайшее время вы получите подтверждение по e-mail.", vacationMsg:"В этот день выходной / отпуск. Пожалуйста, выберите другую дату." },
+            ua: { backHome:"На головну", bookTitle:"Записатися на прийом", bookSubtitle:"Оберіть послугу, працівника та вільний час.", lblService:"Оберіть послугу", optService:"-- Оберіть послугу --", lblEmployee:"Працівник", optEmployee:"-- Спочатку оберіть послугу --", lblDate:"Бажана дата", lblTime:"Вільний час", optTime:"-- Оберіть дату --", lblName:"Ваше ім'я", phName:"Ім'я та прізвище", lblPhone:"Телефон", lblEmail:"E-Mail", submitBtn:"Записатися", thankYou:"Дякуємо!", thankYouSub:"Вашу заявку успішно надіслано. Незабаром ви отримаете підтвердження на e-mail.", vacationMsg:"Цього дня зачинено / відпустка. Будь ласка, оберіть іншу дату." }
+        };
+
+        let bookingLang = localStorage.getItem('buntLang') || 'de';
+
+        function applyBookingLanguage() {
+            const t = bookingTranslations[bookingLang] || bookingTranslations.de;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.textContent = t[key];
+            });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if (t[key]) el.setAttribute('placeholder', t[key]);
+            });
+            document.documentElement.lang = bookingLang;
+        }
 
         function initPage() {
             const serviceSelect = document.getElementById('bookingService');
@@ -177,7 +200,10 @@
             });
 
             if (isBlocked) {
-                timeSelect.innerHTML = '<option value="">Urlaub / Nicht verfügbar</option>';
+                const t = bookingTranslations[bookingLang] || bookingTranslations.de;
+                alert(t.vacationMsg);
+                document.getElementById('bookingDate').value = '';
+                timeSelect.innerHTML = `<option value="">${t.optTime}</option>`;
                 return;
             }
 
@@ -265,6 +291,7 @@
             await cloudLoad();
             storeData = JSON.parse(localStorage.getItem('buntBeautyData')) || storeData;
             initPage();
+            applyBookingLanguage();
         });
     </script>
 </body>

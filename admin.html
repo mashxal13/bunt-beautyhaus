@@ -56,6 +56,13 @@
             if (!('currentUser' in s)) s.currentUser = null;
             return s;
         }
+
+        // Format yyyy-mm-dd -> dd.mm.yyyy for display
+        function fmtDate(d) {
+            if (!d) return '';
+            const p = String(d).split('-');
+            return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : d;
+        }
     </script>
 </head>
 <body class="font-sans bg-zinc-950 text-zinc-100 min-h-screen p-6">
@@ -636,7 +643,7 @@
                 bookingsList.innerHTML += `
                     <div class="p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex justify-between items-center">
                         <div>
-                            <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-semibold">${b.date} ${lang.timeAt} ${b.time} (${b.duration || 30} Min)</span>
+                            <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-semibold">${fmtDate(b.date)} ${lang.timeAt} ${b.time} (${b.duration || 30} Min)</span>
                             <h4 class="font-bold text-white text-sm mt-2">${b.service} <span class="text-zinc-500">(${b.employee})</span></h4>
                             <p class="text-xs text-zinc-400 mt-1">${b.clientName} • ${b.clientPhone} • ${b.clientEmail}</p>
                         </div>
@@ -674,7 +681,7 @@
             filtered.forEach((bp, index) => {
                 list.innerHTML += `
                     <div class="p-3 bg-zinc-950 border border-red-500/30 text-xs rounded-xl flex justify-between items-center">
-                        <span><i class="fa-solid fa-ban text-red-400 mr-1"></i> ${bp.employee}: ${bp.startDate} ${lang.to} ${bp.endDate}</span>
+                        <span><i class="fa-solid fa-ban text-red-400 mr-1"></i> ${bp.employee}: ${fmtDate(bp.startDate)} ${lang.to} ${fmtDate(bp.endDate)}</span>
                         <button onclick="removeBlockPeriod(${index})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
                     </div>`;
             });
@@ -688,7 +695,7 @@
             filtered.forEach((es, index) => {
                 list.innerHTML += `
                     <div class="p-3 bg-zinc-950 border border-zinc-800 text-xs rounded-xl flex justify-between items-center">
-                        <span><i class="fa-solid fa-plus-circle text-emerald-400 mr-1"></i> ${es.employee}: ${es.date} ${lang.timeAt} ${es.time}</span>
+                        <span><i class="fa-solid fa-plus-circle text-emerald-400 mr-1"></i> ${es.employee}: ${fmtDate(es.date)} ${lang.timeAt} ${es.time}</span>
                         <button onclick="removeExtraSlot(${index})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
                     </div>`;
             });

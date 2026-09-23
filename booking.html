@@ -19,6 +19,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Flatpickr date picker (forces dd.mm.yyyy display) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <!-- Supabase Cloud Backend -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -157,6 +161,15 @@
             // Set minimum date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('bookingDate').min = today;
+
+            // Init Flatpickr: shows dd.mm.yyyy, stores yyyy-mm-dd
+            flatpickr('#bookingDate', {
+                dateFormat: 'Y-m-d',      // value kept as yyyy-mm-dd (internal)
+                altInput: true,           // visible field
+                altFormat: 'd.m.Y',       // shown as dd.mm.yyyy
+                minDate: 'today',
+                onChange: updateAvailableTimes
+            });
         }
 
         function onServiceChange() {
@@ -263,6 +276,7 @@
                 service: document.getElementById('bookingService').value,
                 employee: document.getElementById('bookingEmployee').value,
                 date: document.getElementById('bookingDate').value,
+                date_display: (function(d){ if(!d) return ''; const p=d.split('-'); return p.length===3? p[2]+'.'+p[1]+'.'+p[0] : d; })(document.getElementById('bookingDate').value),
                 time: document.getElementById('bookingTime').value,
                 duration: duration
             };

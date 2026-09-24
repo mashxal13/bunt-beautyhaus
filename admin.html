@@ -176,8 +176,9 @@
             <h2 class="text-xl font-bold mb-1 text-emerald-400"><i class="fa-solid fa-concierge-bell mr-2"></i> <span data-i18n="servicesTitle">Leistungen & Dauer verwalten</span></h2>
             <p class="text-xs text-gray-500 mb-6" data-i18n="servicesSub">Legen Sie fest, wie lange jede Behandlungsart dauert (z.B. 30 Min, 45 Min).</p>
             
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
-                <input type="text" id="serviceTitle" data-i18n-ph="servTitlePh" placeholder="Titel (z.B. Maniküre)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-3 mb-4">
+                <input type="text" id="serviceCategory" placeholder="Kategorie (z.B. Manicure)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
+                <input type="text" id="serviceTitle" data-i18n-ph="servTitlePh" placeholder="Titel (z.B. Maniküre)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
                 <input type="text" id="servicePrice" data-i18n-ph="servPricePh" placeholder="Preis (z.B. ab 35,00 €)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
                 <input type="number" id="serviceDuration" data-i18n-ph="servDurationPh" placeholder="Dauer in Min (z.B. 45)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
                 <input type="text" id="serviceDesc" data-i18n-ph="servDescPh" placeholder="Kurze Beschreibung" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
@@ -776,9 +777,11 @@
             const duration = document.getElementById('serviceDuration').value.trim();
             const desc = document.getElementById('serviceDesc').value.trim();
             const assignedTo = document.getElementById('serviceEmployee').value;
+            const category = document.getElementById('serviceCategory').value.trim();
 
             if (title && price && duration) {
-                storeData.services.push({ id: Date.now(), title, price, duration, desc, assignedTo });
+                storeData.services.push({ id: Date.now(), title, price, duration, desc, assignedTo, category });
+                document.getElementById('serviceCategory').value = '';
                 document.getElementById('serviceTitle').value = '';
                 document.getElementById('servicePrice').value = '';
                 document.getElementById('serviceDuration').value = '';

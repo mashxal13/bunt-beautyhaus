@@ -135,6 +135,8 @@
         // Sprach-Wörterbuch (Standard-Texte / Fallback)
         const defaultTranslations = {
             de: {
+                byWord: "von",
+                groupAll: "Studio",
                 navServices: "Leistungen & Preise",
                 navAbout: "Über uns",
                 navBook: "Termin buchen",
@@ -239,29 +241,62 @@
                 document.getElementById('logoContainer').innerHTML = `<img src="${data.logoUrl}" class="h-10 w-auto rounded-lg" alt="Logo">`;
             }
 
-            // Dynamische Leistungen rendern
+            // Leistungen nach Mitarbeiter/in gruppiert (aufklappbar)
             const container = document.getElementById('dynamicServicesContainer');
             if (container && data.services) {
                 container.innerHTML = '';
-                data.services.forEach(service => {
-                    container.innerHTML += `
-                        <div class="p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm relative flex flex-col justify-between">
+
+                // Group services by assigned employee
+                const groups = {};
+                data.services.forEach(s => {
+                    const who = s.assignedTo && s.assignedTo !== 'Alle' ? s.assignedTo : (translations[currentLang]?.groupAll || 'Studio');
+                    (groups[who] = groups[who] || []).push(s);
+                });
+
+                const byWord = translations[currentLang]?.byWord || 'von';
+
+                Object.keys(groups).forEach((emp, idx) => {
+                    const services = groups[emp];
+                    const panelId = 'emp-panel-' + idx;
+                    const cards = services.map(service => `
+                        <div class="p-5 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col justify-between">
                             <div>
-                                <h3 class="font-bold text-lg mb-2">${service.title}</h3>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">${service.desc || ''}</p>
+                                <h4 class="font-bold text-base mb-1">${service.title}</h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">${service.desc || ''}</p>
                             </div>
-                            <div>
-                                <div class="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700">
-                                    <span class="text-brand-600 dark:text-brand-400 font-bold text-sm">${service.price}</span>
-                                    <span class="text-[10px] bg-brand-50 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 px-2 py-1 rounded-md font-medium">
-                                        <i class="fa-solid fa-user mr-1"></i> ${service.assignedTo}
-                                    </span>
-                                </div>
+                            <div class="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-700">
+                                <span class="text-brand-600 dark:text-brand-400 font-bold text-sm">${service.price}</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">${service.duration || 30} Min</span>
                             </div>
                         </div>
+                    `).join('');
+
+                    container.innerHTML += `
+                        <div class="col-span-1 md:col-span-3">
+                            <button type="button" onclick="toggleEmpPanel('${panelId}')"
+                                class="w-full flex items-center justify-between px-6 py-4 bg-brand-50 hover:bg-brand-100 dark:bg-gray-800 dark:hover:bg-gray-700 border border-brand-200 dark:border-gray-700 rounded-2xl transition-colors mb-3">
+                                <span class="font-serif text-lg font-bold text-brand-700 dark:text-brand-300">
+                                    <i class="fa-solid fa-user-tie mr-2"></i> Services ${byWord} ${emp}
+                                </span>
+                                <i id="icon-${panelId}" class="fa-solid fa-chevron-down text-brand-600 transition-transform"></i>
+                            </button>
+                            <div id="${panelId}" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
+                        </div>
                     `;
+                    // fill panel after it exists
+                    setTimeout(() => { const p = document.getElementById(panelId); if (p) p.innerHTML = cards; }, 0);
                 });
             }
+        }
+
+        // Toggle an employee's service panel open/closed
+        function toggleEmpPanel(id) {
+            const panel = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            if (!panel) return;
+            const isHidden = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden');
+            if (icon) icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
         }
 
         function toggleDarkMode() {

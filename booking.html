@@ -23,6 +23,19 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+    <style>
+        /* Make the Flatpickr calendar clearly readable on the light theme */
+        .flatpickr-calendar { border: 1px solid #A1D9B0; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+        .flatpickr-months, .flatpickr-month, .flatpickr-current-month, .flatpickr-monthDropdown-months { color: #235A34 !important; fill: #235A34 !important; }
+        .flatpickr-weekday { color: #3D9457 !important; font-weight: 700; }
+        .flatpickr-day { color: #1f2937 !important; font-weight: 500; }
+        .flatpickr-day:hover { background: #E1F3E6 !important; border-color: #E1F3E6 !important; }
+        .flatpickr-day.today { border-color: #52B771 !important; }
+        .flatpickr-day.selected, .flatpickr-day.selected:hover { background: #52B771 !important; border-color: #52B771 !important; color: #fff !important; }
+        .flatpickr-day.flatpickr-disabled, .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay { color: #cbd5e1 !important; }
+        .flatpickr-months .flatpickr-prev-month svg, .flatpickr-months .flatpickr-next-month svg { fill: #3D9457 !important; }
+    </style>
+
     <!-- Supabase Cloud Backend -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>

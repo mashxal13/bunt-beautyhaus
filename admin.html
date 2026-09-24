@@ -86,15 +86,15 @@
         <!-- Admin Login Form -->
         <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
             <p class="text-xs text-gray-500 mb-4 text-center" data-i18n="adminPinSub">4-stelligen Admin PIN eingeben</p>
-            <input type="password" id="adminPinInput" maxlength="4" placeholder="••••" class="w-full text-center text-3xl bg-white border border-green-200 rounded-2xl py-3 mb-4 focus:outline-none focus:border-emerald-500 text-white">
+            <input type="password" id="adminPinInput" maxlength="4" placeholder="••••" class="w-full text-center text-3xl bg-white border border-green-200 rounded-2xl py-3 mb-4 focus:outline-none focus:border-emerald-500 text-black">
             <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl" data-i18n="loginBtn">Anmelden</button>
         </form>
 
         <!-- Employee Login Form -->
         <form id="empLoginForm" onsubmit="handleEmpLogin(event)" class="hidden space-y-4">
             <p class="text-xs text-gray-500 text-center" data-i18n="empLoginSub">Zugangsdaten eingeben</p>
-            <input type="text" id="empUserInput" data-i18n-ph="usernamePh" placeholder="Benutzername" class="w-full bg-white border border-green-200 rounded-2xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-            <input type="password" id="empPinInput" data-i18n-ph="pinPh" placeholder="PIN" class="w-full bg-white border border-green-200 rounded-2xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+            <input type="text" id="empUserInput" data-i18n-ph="usernamePh" placeholder="Benutzername" class="w-full bg-white border border-green-200 rounded-2xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
+            <input type="password" id="empPinInput" data-i18n-ph="pinPh" placeholder="PIN" class="w-full bg-white border border-green-200 rounded-2xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
             <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl" data-i18n="loginBtn">Anmelden</button>
         </form>
 
@@ -120,9 +120,9 @@
             <p class="text-xs text-gray-500 mb-6" data-i18n="accManageSub">Erstellen Sie Logins für Ihr Team.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-                <input type="text" id="accEmpName" data-i18n-ph="accEmpNamePh" placeholder="Mitarbeiter Name (z.B. Anna)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                <input type="text" id="accUsername" data-i18n-ph="accUserPh" placeholder="Benutzername (z.B. anna)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                <input type="password" id="accPin" data-i18n-ph="accPinPh" placeholder="4-stelliger PIN" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                <input type="text" id="accEmpName" data-i18n-ph="accEmpNamePh" placeholder="Mitarbeiter Name (z.B. Anna)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-amber-500">
+                <input type="text" id="accUsername" data-i18n-ph="accUserPh" placeholder="Benutzername (z.B. anna)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-amber-500">
+                <input type="password" id="accPin" data-i18n-ph="accPinPh" placeholder="4-stelliger PIN" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-amber-500">
                 <button onclick="addAccount()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-xs" data-i18n="createAccBtn">Zugang Erstellen</button>
             </div>
             <div id="userAccountsList" class="space-y-2"></div>
@@ -159,6 +159,10 @@
                     <div><label class="block text-xs text-gray-500 mb-1">Bereich: Überschrift</label>
                         <input type="text" data-content="servicesHeading" class="ce-field w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-sky-500"></div>
                 </div>
+                <div><label class="block text-xs text-gray-500 mb-1">Über uns: Überschrift</label>
+                    <input type="text" data-content="aboutHeading" class="ce-field w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-sky-500"></div>
+                <div><label class="block text-xs text-gray-500 mb-1">Über uns: Text</label>
+                    <textarea data-content="aboutText" rows="3" class="ce-field w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-sky-500"></textarea></div>
             </div>
 
             <button type="button" onclick="saveContent()" class="mt-4 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl"><i class="fa-solid fa-floppy-disk mr-1"></i> Texte speichern</button>
@@ -179,10 +183,10 @@
             <div class="grid grid-cols-1 md:grid-cols-6 gap-3 mb-4">
                 <input type="text" id="serviceCategory" placeholder="Kategorie (z.B. Manicure)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
                 <input type="text" id="serviceTitle" data-i18n-ph="servTitlePh" placeholder="Titel (z.B. Maniküre)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
-                <input type="text" id="servicePrice" data-i18n-ph="servPricePh" placeholder="Preis (z.B. ab 35,00 €)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <input type="number" id="serviceDuration" data-i18n-ph="servDurationPh" placeholder="Dauer in Min (z.B. 45)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <input type="text" id="serviceDesc" data-i18n-ph="servDescPh" placeholder="Kurze Beschreibung" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <select id="serviceEmployee" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <input type="text" id="servicePrice" data-i18n-ph="servPricePh" placeholder="Preis (z.B. ab 35,00 €)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
+                <input type="number" id="serviceDuration" data-i18n-ph="servDurationPh" placeholder="Dauer in Min (z.B. 45)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
+                <input type="text" id="serviceDesc" data-i18n-ph="servDescPh" placeholder="Kurze Beschreibung" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
+                <select id="serviceEmployee" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
                     <option value="Alle">Zugeteilt an: Alle</option>
                 </select>
             </div>
@@ -198,15 +202,15 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
                 <div>
                     <label class="block text-xs text-gray-500 mb-1" data-i18n="employeeLabel">Mitarbeiter/in</label>
-                    <select id="blockEmployeeSelect" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500"></select>
+                    <select id="blockEmployeeSelect" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500"></select>
                 </div>
                 <div>
                     <label class="block text-xs text-gray-500 mb-1" data-i18n="fromDateLabel">Von Datum</label>
-                    <input type="date" id="blockStartDate" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                    <input type="date" id="blockStartDate" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
                     <label class="block text-xs text-gray-500 mb-1" data-i18n="toDateLabel">Bis Datum</label>
-                    <input type="date" id="blockEndDate" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                    <input type="date" id="blockEndDate" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
                 </div>
                 <div class="flex items-end">
                     <button onclick="addBlockPeriod()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl text-xs" data-i18n="addBlockBtn">Zeitraum Blockieren</button>
@@ -221,9 +225,9 @@
             <p class="text-xs text-gray-500 mb-6" data-i18n="extraSlotSub">Standard-Öffnungszeiten sind Mo–Sa 09:00–18:00 Uhr. Hier können Sie spezielle Zusatz-Uhrzeiten freigeben.</p>
             
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-                <select id="extraSlotEmployee" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500"></select>
-                <input type="date" id="extraSlotDate" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <input type="time" id="extraSlotTime" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <select id="extraSlotEmployee" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500"></select>
+                <input type="date" id="extraSlotDate" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
+                <input type="time" id="extraSlotTime" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
                 <button onclick="addExtraSlot()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-xs" data-i18n="addExtraSlotBtn">Zusatz-Slot Hinzufügen</button>
             </div>
             <div id="extraSlotsList" class="space-y-2"></div>
@@ -233,7 +237,7 @@
         <section id="employeeAdminSection" class="bg-green-50 border border-green-200 rounded-2xl p-6">
             <h2 class="text-xl font-bold mb-4 text-emerald-400"><i class="fa-solid fa-users mr-2"></i> <span data-i18n="employeesTitle">Mitarbeiter Verwalten</span></h2>
             <div id="addEmpControls" class="flex gap-2 mb-4">
-                <input type="text" id="newEmployeeName" data-i18n-ph="newEmpNamePh" placeholder="Name des Mitarbeiters" class="flex-1 bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <input type="text" id="newEmployeeName" data-i18n-ph="newEmpNamePh" placeholder="Name des Mitarbeiters" class="flex-1 bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
                 <button onclick="addEmployee()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl" data-i18n="addEmpBtn">Hinzufügen</button>
             </div>
             <ul id="employeeList" class="space-y-2"></ul>
@@ -703,12 +707,12 @@
         }
 
                         // Website Content Editor logic
-        const CONTENT_KEYS = ['heroWelcome','heroSubText','navServices','navAbout','navBook','servicesBadge','servicesHeading'];
+        const CONTENT_KEYS = ['heroWelcome','heroSubText','navServices','navAbout','navBook','servicesBadge','servicesHeading','aboutHeading','aboutText'];
         let currentContentLang = 'de';
 
         // Default website texts (same as index.html defaults) so the editor is never empty
         const contentDefaults = {
-            de: { heroWelcome: "Willkommen im", heroSubText: "Ihr exklusives Studio für professionelles Nageldesign, Maniküre & Pediküre, Wimpern- & Augenbrauenlifting.", navServices: "Leistungen & Preise", navAbout: "Über uns", navBook: "Termin buchen", servicesBadge: "Angebote & Preise", servicesHeading: "Behandlungen & Preise" },
+            de: { heroWelcome: "Willkommen im", heroSubText: "Ihr exklusives Studio für professionelles Nageldesign, Maniküre & Pediküre, Wimpern- & Augenbrauenlifting.", navServices: "Leistungen & Preise", navAbout: "Über uns", navBook: "Termin buchen", servicesBadge: "Angebote & Preise", servicesHeading: "Behandlungen & Preise", aboutHeading: "Willkommen bei BUNT Beautyhaus", aboutText: "Wir sind Ihr exklusives Studio für professionelle Beauty-Behandlungen in Achim bei Bremen." },
             en: { heroWelcome: "Welcome to", heroSubText: "Your exclusive studio for professional nail design, manicure & pedicure, lash & brow lifting.", navServices: "Services & Prices", navAbout: "About Us", navBook: "Book Appointment", servicesBadge: "Offers & Pricing", servicesHeading: "Treatments & Prices" },
             ru: { heroWelcome: "Добро пожаловать в", heroSubText: "Ваша эксклюзивная студия профессионального дизайна ногтей, маникюра и педикюра, ламинирования ресниц и бровей.", navServices: "Услуги и цены", navAbout: "О нас", navBook: "Записаться", servicesBadge: "Предложения и цены", servicesHeading: "Услуги и цены" },
             ua: { heroWelcome: "Ласкаво просимо до", heroSubText: "Ваша ексклюзивна студія професійного дизайну нігтів, манікюру та педикюру, ламінування вій та брів.", navServices: "Послуги та ціни", navAbout: "Про нас", navBook: "Записатися", servicesBadge: "Пропозиції та ціни", servicesHeading: "Послуги та ціни" }

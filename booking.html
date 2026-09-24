@@ -54,63 +54,63 @@
         })();
     </script>
 </head>
-<body class="font-sans bg-zinc-950 text-zinc-100 min-h-screen p-6">
+<body class="font-sans bg-white text-gray-800 min-h-screen p-6">
 
-    <div class="max-w-2xl mx-auto my-10 bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+    <div class="max-w-2xl mx-auto my-10 bg-green-50 border border-green-200 rounded-3xl p-8 shadow-2xl">
         <a href="index.html" class="inline-flex items-center text-xs text-emerald-400 hover:underline mb-6">
             <i class="fa-solid fa-arrow-left mr-2"></i> <span data-i18n="backHome">Zurück zur Startseite</span>
         </a>
         
         <h1 class="text-3xl font-serif font-bold text-white mb-2" data-i18n="bookTitle">Termin vereinbaren</h1>
-        <p class="text-xs text-zinc-400 mb-8" data-i18n="bookSubtitle">Wählen Sie Ihre Behandlung, eine/n Mitarbeiter/in und eine verfügbare Uhrzeit.</p>
+        <p class="text-xs text-gray-500 mb-8" data-i18n="bookSubtitle">Wählen Sie Ihre Behandlung, eine/n Mitarbeiter/in und eine verfügbare Uhrzeit.</p>
 
         <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4">
             <div>
-                <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblService">Leistung auswählen</label>
-                <select id="bookingService" required onchange="onServiceChange()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblService">Leistung auswählen</label>
+                <select id="bookingService" required onchange="onServiceChange()" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
                     <option value="" data-i18n="optService">-- Leistung wählen --</option>
                 </select>
             </div>
 
             <div>
-                <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblEmployee">Mitarbeiter/in</label>
-                <select id="bookingEmployee" required onchange="updateAvailableTimes()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblEmployee">Mitarbeiter/in</label>
+                <select id="bookingEmployee" required onchange="updateAvailableTimes()" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
                     <option value="" data-i18n="optEmployee">-- Zuerst Leistung wählen --</option>
                 </select>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblDate">Wunschdatum</label>
-                    <input type="date" id="bookingDate" required onchange="updateAvailableTimes()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblDate">Wunschdatum</label>
+                    <input type="date" id="bookingDate" required onchange="updateAvailableTimes()" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblTime">Freier Uhrzeit-Slot</label>
-                    <select id="bookingTime" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblTime">Freier Uhrzeit-Slot</label>
+                    <select id="bookingTime" required class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
                         <option value="" data-i18n="optTime">-- Datum wählen --</option>
                     </select>
                 </div>
             </div>
 
-            <hr class="border-zinc-800 my-4">
+            <hr class="border-green-200 my-4">
 
             <div>
-                <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblName">Ihr Name</label>
-                <input type="text" id="clientName" required placeholder="Vor- und Nachname" data-i18n-ph="phName" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblName">Ihr Name</label>
+                <input type="text" id="clientName" required placeholder="Vor- und Nachname" data-i18n-ph="phName" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblPhone">Telefonnummer</label>
-                    <input type="tel" id="clientPhone" required placeholder="+49 ..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblPhone">Telefonnummer</label>
+                    <input type="tel" id="clientPhone" required placeholder="+49 ..." class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-zinc-400 mb-1" data-i18n="lblEmail">E-Mail</label>
-                    <input type="email" id="clientEmail" required placeholder="name@example.com" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblEmail">E-Mail</label>
+                    <input type="email" id="clientEmail" required placeholder="name@example.com" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
                 </div>
             </div>
 
-            <button type="submit" id="submitBtn" data-i18n="submitBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold py-3.5 rounded-2xl transition-all mt-6">
+            <button type="submit" id="submitBtn" data-i18n="submitBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl transition-all mt-6">
                 Termin verbindlich anfragen
             </button>
         </form>
@@ -120,8 +120,8 @@
                 <i class="fa-solid fa-check"></i>
             </div>
             <h2 class="text-2xl font-serif font-bold text-white mb-2" data-i18n="thankYou">Vielen Dank!</h2>
-            <p class="text-xs text-zinc-400 mb-6" data-i18n="thankYouSub">Ihre Terminanfrage wurde erfolgreich übermittelt. Sie erhalten in Kürze eine Bestätigung per E-Mail.</p>
-            <a href="index.html" class="inline-block px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-xl" data-i18n="backHome">Zurück zur Startseite</a>
+            <p class="text-xs text-gray-500 mb-6" data-i18n="thankYouSub">Ihre Terminanfrage wurde erfolgreich übermittelt. Sie erhalten in Kürze eine Bestätigung per E-Mail.</p>
+            <a href="index.html" class="inline-block px-6 py-2.5 bg-green-100 hover:bg-green-200 text-white text-xs font-bold rounded-xl" data-i18n="backHome">Zurück zur Startseite</a>
         </div>
     </div>
 

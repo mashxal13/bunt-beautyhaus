@@ -65,37 +65,37 @@
         }
     </script>
 </head>
-<body class="font-sans bg-zinc-950 text-zinc-100 min-h-screen p-6">
+<body class="font-sans bg-white text-gray-800 min-h-screen p-6">
 
     <!-- Top Language Switcher Bar -->
     <div class="max-w-5xl mx-auto flex justify-end mb-4 gap-2">
-        <button onclick="setLanguage('de')" id="lang-btn-de" class="px-3 py-1 text-xs font-bold rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white">DE</button>
-        <button onclick="setLanguage('en')" id="lang-btn-en" class="px-3 py-1 text-xs font-bold rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white">EN</button>
-        <button onclick="setLanguage('ru')" id="lang-btn-ru" class="px-3 py-1 text-xs font-bold rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white">RU</button>
-        <button onclick="setLanguage('ua')" id="lang-btn-ua" class="px-3 py-1 text-xs font-bold rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white">UA</button>
+        <button onclick="setLanguage('de')" id="lang-btn-de" class="px-3 py-1 text-xs font-bold rounded-lg border border-green-200 bg-green-50 text-gray-500 hover:text-white">DE</button>
+        <button onclick="setLanguage('en')" id="lang-btn-en" class="px-3 py-1 text-xs font-bold rounded-lg border border-green-200 bg-green-50 text-gray-500 hover:text-white">EN</button>
+        <button onclick="setLanguage('ru')" id="lang-btn-ru" class="px-3 py-1 text-xs font-bold rounded-lg border border-green-200 bg-green-50 text-gray-500 hover:text-white">RU</button>
+        <button onclick="setLanguage('ua')" id="lang-btn-ua" class="px-3 py-1 text-xs font-bold rounded-lg border border-green-200 bg-green-50 text-gray-500 hover:text-white">UA</button>
     </div>
 
     <!-- Login Container -->
-    <div id="loginCard" class="max-w-md mx-auto my-12 p-8 bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl">
+    <div id="loginCard" class="max-w-md mx-auto my-12 p-8 bg-green-50 border border-green-200 rounded-3xl shadow-2xl">
         <!-- Tabs -->
-        <div class="flex border-b border-zinc-800 mb-6">
+        <div class="flex border-b border-green-200 mb-6">
             <button id="tabAdminBtn" onclick="switchLoginTab('admin')" class="w-1/2 pb-3 font-semibold text-sm border-b-2 border-emerald-500 text-emerald-400" data-i18n="adminLoginTab">Admin Login</button>
-            <button id="tabEmpBtn" onclick="switchLoginTab('employee')" class="w-1/2 pb-3 font-semibold text-sm border-b-2 border-transparent text-zinc-500" data-i18n="empLoginTab">Mitarbeiter Login</button>
+            <button id="tabEmpBtn" onclick="switchLoginTab('employee')" class="w-1/2 pb-3 font-semibold text-sm border-b-2 border-transparent text-gray-400" data-i18n="empLoginTab">Mitarbeiter Login</button>
         </div>
 
         <!-- Admin Login Form -->
         <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
-            <p class="text-xs text-zinc-400 mb-4 text-center" data-i18n="adminPinSub">4-stelligen Admin PIN eingeben</p>
-            <input type="password" id="adminPinInput" maxlength="4" placeholder="••••" class="w-full text-center text-3xl bg-zinc-950 border border-zinc-800 rounded-2xl py-3 mb-4 focus:outline-none focus:border-emerald-500 text-white">
-            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold py-3.5 rounded-2xl" data-i18n="loginBtn">Anmelden</button>
+            <p class="text-xs text-gray-500 mb-4 text-center" data-i18n="adminPinSub">4-stelligen Admin PIN eingeben</p>
+            <input type="password" id="adminPinInput" maxlength="4" placeholder="••••" class="w-full text-center text-3xl bg-white border border-green-200 rounded-2xl py-3 mb-4 focus:outline-none focus:border-emerald-500 text-white">
+            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl" data-i18n="loginBtn">Anmelden</button>
         </form>
 
         <!-- Employee Login Form -->
         <form id="empLoginForm" onsubmit="handleEmpLogin(event)" class="hidden space-y-4">
-            <p class="text-xs text-zinc-400 text-center" data-i18n="empLoginSub">Zugangsdaten eingeben</p>
-            <input type="text" id="empUserInput" data-i18n-ph="usernamePh" placeholder="Benutzername" class="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-            <input type="password" id="empPinInput" data-i18n-ph="pinPh" placeholder="PIN" class="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold py-3.5 rounded-2xl" data-i18n="loginBtn">Anmelden</button>
+            <p class="text-xs text-gray-500 text-center" data-i18n="empLoginSub">Zugangsdaten eingeben</p>
+            <input type="text" id="empUserInput" data-i18n-ph="usernamePh" placeholder="Benutzername" class="w-full bg-white border border-green-200 rounded-2xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+            <input type="password" id="empPinInput" data-i18n-ph="pinPh" placeholder="PIN" class="w-full bg-white border border-green-200 rounded-2xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl" data-i18n="loginBtn">Anmelden</button>
         </form>
 
         <p id="loginError" class="text-red-400 text-xs mt-3 text-center hidden" data-i18n="loginError">Zugangsdaten falsch.</p>
@@ -104,10 +104,10 @@
     <!-- Admin Dashboard -->
     <div id="adminDashboard" class="hidden max-w-5xl mx-auto space-y-8 my-6">
         
-        <header class="flex justify-between items-center border-b border-zinc-800 pb-4">
+        <header class="flex justify-between items-center border-b border-green-200 pb-4">
             <div>
                 <h1 class="text-2xl font-bold font-serif text-white">BUNT Admin Dashboard</h1>
-                <p id="welcomeSubtitle" class="text-xs text-zinc-400" data-i18n="dashboardSub">Verwaltung, Arbeitszeiten & Buchungen</p>
+                <p id="welcomeSubtitle" class="text-xs text-gray-500" data-i18n="dashboardSub">Verwaltung, Arbeitszeiten & Buchungen</p>
             </div>
             <button onclick="logoutAdmin()" class="px-4 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20">
                 <i class="fa-solid fa-sign-out-alt mr-1"></i> <span data-i18n="logoutBtn">Abmelden</span>
@@ -115,97 +115,97 @@
         </header>
 
         <!-- Admin-Only Account Creator -->
-        <section id="adminOnlySection" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 border-l-4 border-l-amber-500">
+        <section id="adminOnlySection" class="bg-green-50 border border-green-200 rounded-2xl p-6 border-l-4 border-l-amber-500">
             <h2 class="text-xl font-bold mb-1 text-amber-400"><i class="fa-solid fa-key mr-2"></i> <span data-i18n="accManageTitle">Mitarbeiter-Zugänge verwalten</span></h2>
-            <p class="text-xs text-zinc-400 mb-6" data-i18n="accManageSub">Erstellen Sie Logins für Ihr Team.</p>
+            <p class="text-xs text-gray-500 mb-6" data-i18n="accManageSub">Erstellen Sie Logins für Ihr Team.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-                <input type="text" id="accEmpName" data-i18n-ph="accEmpNamePh" placeholder="Mitarbeiter Name (z.B. Anna)" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                <input type="text" id="accUsername" data-i18n-ph="accUserPh" placeholder="Benutzername (z.B. anna)" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                <input type="password" id="accPin" data-i18n-ph="accPinPh" placeholder="4-stelliger PIN" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                <button onclick="addAccount()" class="bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold py-3 rounded-xl text-xs" data-i18n="createAccBtn">Zugang Erstellen</button>
+                <input type="text" id="accEmpName" data-i18n-ph="accEmpNamePh" placeholder="Mitarbeiter Name (z.B. Anna)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                <input type="text" id="accUsername" data-i18n-ph="accUserPh" placeholder="Benutzername (z.B. anna)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                <input type="password" id="accPin" data-i18n-ph="accPinPh" placeholder="4-stelliger PIN" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                <button onclick="addAccount()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-xs" data-i18n="createAccBtn">Zugang Erstellen</button>
             </div>
             <div id="userAccountsList" class="space-y-2"></div>
         </section>
 
                 <!-- Website Content Editor -->
-        <section id="contentEditorSection" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 border-l-4 border-l-sky-500">
+        <section id="contentEditorSection" class="bg-green-50 border border-green-200 rounded-2xl p-6 border-l-4 border-l-sky-500">
             <h2 class="text-xl font-bold mb-1 text-sky-400"><i class="fa-solid fa-language mr-2"></i> Website-Texte bearbeiten</h2>
-            <p class="text-xs text-zinc-400 mb-4">Bearbeiten Sie alle Texte der Startseite in allen 4 Sprachen. Leer lassen = Standardtext.</p>
+            <p class="text-xs text-gray-500 mb-4">Bearbeiten Sie alle Texte der Startseite in allen 4 Sprachen. Leer lassen = Standardtext.</p>
 
             <div class="flex gap-2 mb-4">
-                <button type="button" onclick="setContentLang('de')" id="cLang-de" class="px-3 py-1 text-xs font-bold rounded-lg border border-sky-500 bg-sky-500 text-zinc-950">DE</button>
-                <button type="button" onclick="setContentLang('en')" id="cLang-en" class="px-3 py-1 text-xs font-bold rounded-lg border border-zinc-700 text-zinc-400">EN</button>
-                <button type="button" onclick="setContentLang('ru')" id="cLang-ru" class="px-3 py-1 text-xs font-bold rounded-lg border border-zinc-700 text-zinc-400">RU</button>
-                <button type="button" onclick="setContentLang('ua')" id="cLang-ua" class="px-3 py-1 text-xs font-bold rounded-lg border border-zinc-700 text-zinc-400">UA</button>
+                <button type="button" onclick="setContentLang('de')" id="cLang-de" class="px-3 py-1 text-xs font-bold rounded-lg border border-sky-500 bg-sky-500 text-white">DE</button>
+                <button type="button" onclick="setContentLang('en')" id="cLang-en" class="px-3 py-1 text-xs font-bold rounded-lg border border-green-300 text-gray-500">EN</button>
+                <button type="button" onclick="setContentLang('ru')" id="cLang-ru" class="px-3 py-1 text-xs font-bold rounded-lg border border-green-300 text-gray-500">RU</button>
+                <button type="button" onclick="setContentLang('ua')" id="cLang-ua" class="px-3 py-1 text-xs font-bold rounded-lg border border-green-300 text-gray-500">UA</button>
             </div>
 
             <div class="grid grid-cols-1 gap-3">
-                <div><label class="block text-xs text-zinc-400 mb-1">Hero: Begrüßung (z.B. "Willkommen im")</label>
-                    <input type="text" data-content="heroWelcome" class="ce-field w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
-                <div><label class="block text-xs text-zinc-400 mb-1">Hero: Untertext</label>
-                    <textarea data-content="heroSubText" rows="2" class="ce-field w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></textarea></div>
+                <div><label class="block text-xs text-gray-500 mb-1">Hero: Begrüßung (z.B. "Willkommen im")</label>
+                    <input type="text" data-content="heroWelcome" class="ce-field w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
+                <div><label class="block text-xs text-gray-500 mb-1">Hero: Untertext</label>
+                    <textarea data-content="heroSubText" rows="2" class="ce-field w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></textarea></div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div><label class="block text-xs text-zinc-400 mb-1">Nav: Leistungen</label>
-                        <input type="text" data-content="navServices" class="ce-field w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">Nav: Über uns</label>
-                        <input type="text" data-content="navAbout" class="ce-field w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">Nav: Termin buchen</label>
-                        <input type="text" data-content="navBook" class="ce-field w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">Nav: Leistungen</label>
+                        <input type="text" data-content="navServices" class="ce-field w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">Nav: Über uns</label>
+                        <input type="text" data-content="navAbout" class="ce-field w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">Nav: Termin buchen</label>
+                        <input type="text" data-content="navBook" class="ce-field w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div><label class="block text-xs text-zinc-400 mb-1">Bereich: kleiner Titel (Badge)</label>
-                        <input type="text" data-content="servicesBadge" class="ce-field w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">Bereich: Überschrift</label>
-                        <input type="text" data-content="servicesHeading" class="ce-field w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">Bereich: kleiner Titel (Badge)</label>
+                        <input type="text" data-content="servicesBadge" class="ce-field w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
+                    <div><label class="block text-xs text-gray-500 mb-1">Bereich: Überschrift</label>
+                        <input type="text" data-content="servicesHeading" class="ce-field w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-sky-500"></div>
                 </div>
             </div>
 
-            <button type="button" onclick="saveContent()" class="mt-4 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-zinc-950 font-bold text-xs rounded-xl"><i class="fa-solid fa-floppy-disk mr-1"></i> Texte speichern</button>
+            <button type="button" onclick="saveContent()" class="mt-4 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl"><i class="fa-solid fa-floppy-disk mr-1"></i> Texte speichern</button>
             <span id="contentSavedMsg" class="ml-3 text-xs text-emerald-400 hidden">Gespeichert! ✓</span>
         </section>
 
         <!-- Bookings List -->
-        <section class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+        <section class="bg-green-50 border border-green-200 rounded-2xl p-6">
             <h2 class="text-xl font-bold mb-4 text-emerald-400"><i class="fa-solid fa-calendar-check mr-2"></i> <span data-i18n="bookingsTitle">Eingegangene Termine</span></h2>
-            <div id="bookingsList" class="space-y-3"><p class="text-xs text-zinc-500" data-i18n="noBookings">Keine neuen Termine vorhanden.</p></div>
+            <div id="bookingsList" class="space-y-3"><p class="text-xs text-gray-400" data-i18n="noBookings">Keine neuen Termine vorhanden.</p></div>
         </section>
 
         <!-- Services Management -->
-        <section class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 border-l-4 border-l-emerald-500">
+        <section class="bg-green-50 border border-green-200 rounded-2xl p-6 border-l-4 border-l-emerald-500">
             <h2 class="text-xl font-bold mb-1 text-emerald-400"><i class="fa-solid fa-concierge-bell mr-2"></i> <span data-i18n="servicesTitle">Leistungen & Dauer verwalten</span></h2>
-            <p class="text-xs text-zinc-400 mb-6" data-i18n="servicesSub">Legen Sie fest, wie lange jede Behandlungsart dauert (z.B. 30 Min, 45 Min).</p>
+            <p class="text-xs text-gray-500 mb-6" data-i18n="servicesSub">Legen Sie fest, wie lange jede Behandlungsart dauert (z.B. 30 Min, 45 Min).</p>
             
             <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
-                <input type="text" id="serviceTitle" data-i18n-ph="servTitlePh" placeholder="Titel (z.B. Maniküre)" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <input type="text" id="servicePrice" data-i18n-ph="servPricePh" placeholder="Preis (z.B. ab 35,00 €)" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <input type="number" id="serviceDuration" data-i18n-ph="servDurationPh" placeholder="Dauer in Min (z.B. 45)" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <input type="text" id="serviceDesc" data-i18n-ph="servDescPh" placeholder="Kurze Beschreibung" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <select id="serviceEmployee" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <input type="text" id="serviceTitle" data-i18n-ph="servTitlePh" placeholder="Titel (z.B. Maniküre)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <input type="text" id="servicePrice" data-i18n-ph="servPricePh" placeholder="Preis (z.B. ab 35,00 €)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <input type="number" id="serviceDuration" data-i18n-ph="servDurationPh" placeholder="Dauer in Min (z.B. 45)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <input type="text" id="serviceDesc" data-i18n-ph="servDescPh" placeholder="Kurze Beschreibung" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <select id="serviceEmployee" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
                     <option value="Alle">Zugeteilt an: Alle</option>
                 </select>
             </div>
-            <button onclick="addService()" class="mb-6 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold text-xs rounded-xl" data-i18n="addServiceBtn">Leistung Hinzufügen</button>
+            <button onclick="addService()" class="mb-6 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl" data-i18n="addServiceBtn">Leistung Hinzufügen</button>
             <div id="servicesList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
         <!-- Block Dates / Vacation Management -->
-        <section class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 border-l-4 border-l-red-500">
+        <section class="bg-green-50 border border-green-200 rounded-2xl p-6 border-l-4 border-l-red-500">
             <h2 class="text-xl font-bold mb-1 text-red-400"><i class="fa-solid fa-umbrella-beach mr-2"></i> <span data-i18n="blockTitle">Urlaub & Sperrzeiten (Tage/Wochen blockieren)</span></h2>
-            <p class="text-xs text-zinc-400 mb-6" data-i18n="blockSub">Blockieren Sie ganze Tage oder Zeiträume für Mitarbeiter bei Krankheit oder Urlaub.</p>
+            <p class="text-xs text-gray-500 mb-6" data-i18n="blockSub">Blockieren Sie ganze Tage oder Zeiträume für Mitarbeiter bei Krankheit oder Urlaub.</p>
             
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
                 <div>
-                    <label class="block text-xs text-zinc-400 mb-1" data-i18n="employeeLabel">Mitarbeiter/in</label>
-                    <select id="blockEmployeeSelect" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500"></select>
+                    <label class="block text-xs text-gray-500 mb-1" data-i18n="employeeLabel">Mitarbeiter/in</label>
+                    <select id="blockEmployeeSelect" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500"></select>
                 </div>
                 <div>
-                    <label class="block text-xs text-zinc-400 mb-1" data-i18n="fromDateLabel">Von Datum</label>
-                    <input type="date" id="blockStartDate" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                    <label class="block text-xs text-gray-500 mb-1" data-i18n="fromDateLabel">Von Datum</label>
+                    <input type="date" id="blockStartDate" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                    <label class="block text-xs text-zinc-400 mb-1" data-i18n="toDateLabel">Bis Datum</label>
-                    <input type="date" id="blockEndDate" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                    <label class="block text-xs text-gray-500 mb-1" data-i18n="toDateLabel">Bis Datum</label>
+                    <input type="date" id="blockEndDate" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
                 </div>
                 <div class="flex items-end">
                     <button onclick="addBlockPeriod()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl text-xs" data-i18n="addBlockBtn">Zeitraum Blockieren</button>
@@ -215,25 +215,25 @@
         </section>
 
         <!-- Custom Manual Extra Slots Management -->
-        <section class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+        <section class="bg-green-50 border border-green-200 rounded-2xl p-6">
             <h2 class="text-xl font-bold mb-1 text-emerald-400"><i class="fa-solid fa-plus-circle mr-2"></i> <span data-i18n="extraSlotTitle">Manuelle Zusatz-Slots</span></h2>
-            <p class="text-xs text-zinc-400 mb-6" data-i18n="extraSlotSub">Standard-Öffnungszeiten sind Mo–Sa 09:00–18:00 Uhr. Hier können Sie spezielle Zusatz-Uhrzeiten freigeben.</p>
+            <p class="text-xs text-gray-500 mb-6" data-i18n="extraSlotSub">Standard-Öffnungszeiten sind Mo–Sa 09:00–18:00 Uhr. Hier können Sie spezielle Zusatz-Uhrzeiten freigeben.</p>
             
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-                <select id="extraSlotEmployee" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500"></select>
-                <input type="date" id="extraSlotDate" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <input type="time" id="extraSlotTime" class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <button onclick="addExtraSlot()" class="bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold py-3 rounded-xl text-xs" data-i18n="addExtraSlotBtn">Zusatz-Slot Hinzufügen</button>
+                <select id="extraSlotEmployee" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500"></select>
+                <input type="date" id="extraSlotDate" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <input type="time" id="extraSlotTime" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <button onclick="addExtraSlot()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-xs" data-i18n="addExtraSlotBtn">Zusatz-Slot Hinzufügen</button>
             </div>
             <div id="extraSlotsList" class="space-y-2"></div>
         </section>
 
         <!-- Employees List -->
-        <section id="employeeAdminSection" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+        <section id="employeeAdminSection" class="bg-green-50 border border-green-200 rounded-2xl p-6">
             <h2 class="text-xl font-bold mb-4 text-emerald-400"><i class="fa-solid fa-users mr-2"></i> <span data-i18n="employeesTitle">Mitarbeiter Verwalten</span></h2>
             <div id="addEmpControls" class="flex gap-2 mb-4">
-                <input type="text" id="newEmployeeName" data-i18n-ph="newEmpNamePh" placeholder="Name des Mitarbeiters" class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <button onclick="addEmployee()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold text-xs rounded-xl" data-i18n="addEmpBtn">Hinzufügen</button>
+                <input type="text" id="newEmployeeName" data-i18n-ph="newEmpNamePh" placeholder="Name des Mitarbeiters" class="flex-1 bg-white border border-green-200 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <button onclick="addEmployee()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl" data-i18n="addEmpBtn">Hinzufügen</button>
             </div>
             <ul id="employeeList" class="space-y-2"></ul>
         </section>
@@ -443,7 +443,7 @@
                     if (l === currentLang) {
                         btn.className = "px-3 py-1 text-xs font-bold rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400";
                     } else {
-                        btn.className = "px-3 py-1 text-xs font-bold rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white";
+                        btn.className = "px-3 py-1 text-xs font-bold rounded-lg border border-green-200 bg-green-50 text-gray-500 hover:text-white";
                     }
                 }
             });
@@ -514,10 +514,10 @@
             
             document.getElementById('tabAdminBtn').className = isAdmin 
                 ? "w-1/2 pb-3 font-semibold text-sm border-b-2 border-emerald-500 text-emerald-400"
-                : "w-1/2 pb-3 font-semibold text-sm border-b-2 border-transparent text-zinc-500";
+                : "w-1/2 pb-3 font-semibold text-sm border-b-2 border-transparent text-gray-400";
             document.getElementById('tabEmpBtn').className = !isAdmin 
                 ? "w-1/2 pb-3 font-semibold text-sm border-b-2 border-emerald-500 text-emerald-400"
-                : "w-1/2 pb-3 font-semibold text-sm border-b-2 border-transparent text-zinc-500";
+                : "w-1/2 pb-3 font-semibold text-sm border-b-2 border-transparent text-gray-400";
         }
 
         // 4. Login & Logout
@@ -607,7 +607,7 @@
 
             (storeData.employees || []).forEach((emp, index) => {
                 empList.innerHTML += `
-                    <li class="flex justify-between items-center bg-zinc-950 p-3 rounded-xl border border-zinc-800 text-xs">
+                    <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-green-200 text-xs">
                         <span><i class="fa-solid fa-user-check text-emerald-400 mr-2"></i>${emp}</span>
                         ${!isEmp ? `<button onclick="removeEmployee(${index})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </li>`;
@@ -624,7 +624,7 @@
                 accList.innerHTML = '';
                 (storeData.userAccounts || []).forEach((acc, i) => {
                     accList.innerHTML += `
-                        <div class="p-3 bg-zinc-950 border border-zinc-800 text-xs rounded-xl flex justify-between items-center">
+                        <div class="p-3 bg-white border border-green-200 text-xs rounded-xl flex justify-between items-center">
                             <span><strong class="text-amber-400">${acc.employeeName}</strong> (User: ${acc.username} | PIN: ****)</span>
                             <button onclick="removeAccount(${i})" class="text-red-400"><i class="fa-solid fa-trash"></i></button>
                         </div>`;
@@ -637,15 +637,15 @@
                 : (storeData.bookings || []);
 
             const bookingsList = document.getElementById('bookingsList');
-            bookingsList.innerHTML = filteredBookings.length ? '' : `<p class="text-xs text-zinc-500">${lang.noBookings}</p>`;
+            bookingsList.innerHTML = filteredBookings.length ? '' : `<p class="text-xs text-gray-400">${lang.noBookings}</p>`;
             
             filteredBookings.forEach((b, index) => {
                 bookingsList.innerHTML += `
-                    <div class="p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex justify-between items-center">
+                    <div class="p-4 bg-white border border-green-200 rounded-xl flex justify-between items-center">
                         <div>
                             <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-semibold">${fmtDate(b.date)} ${lang.timeAt} ${b.time} (${b.duration || 30} Min)</span>
-                            <h4 class="font-bold text-white text-sm mt-2">${b.service} <span class="text-zinc-500">(${b.employee})</span></h4>
-                            <p class="text-xs text-zinc-400 mt-1">${b.clientName} • ${b.clientPhone} • ${b.clientEmail}</p>
+                            <h4 class="font-bold text-white text-sm mt-2">${b.service} <span class="text-gray-400">(${b.employee})</span></h4>
+                            <p class="text-xs text-gray-500 mt-1">${b.clientName} • ${b.clientPhone} • ${b.clientEmail}</p>
                         </div>
                         <button onclick="deleteBooking(${index})" class="text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-lg hover:bg-red-500/20">${lang.cancelBtn}</button>
                     </div>`;
@@ -664,11 +664,11 @@
 
             filtered.forEach(s => {
                 servList.innerHTML += `
-                    <div class="p-4 bg-zinc-950 border border-zinc-800 rounded-xl relative">
+                    <div class="p-4 bg-white border border-green-200 rounded-xl relative">
                         ${!isEmp ? `<button onclick="removeService(${s.id})" class="absolute top-3 right-3 text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>` : ''}
                         <h4 class="font-bold text-white text-sm">${s.title}</h4>
                         <p class="text-xs text-emerald-400 mt-0.5">${s.price} • ${s.duration || 30} Min</p>
-                        <p class="text-xs text-zinc-400 mt-2">${s.desc}</p>
+                        <p class="text-xs text-gray-500 mt-2">${s.desc}</p>
                     </div>`;
             });
         }
@@ -680,7 +680,7 @@
 
             filtered.forEach((bp, index) => {
                 list.innerHTML += `
-                    <div class="p-3 bg-zinc-950 border border-red-500/30 text-xs rounded-xl flex justify-between items-center">
+                    <div class="p-3 bg-white border border-red-500/30 text-xs rounded-xl flex justify-between items-center">
                         <span><i class="fa-solid fa-ban text-red-400 mr-1"></i> ${bp.employee}: ${fmtDate(bp.startDate)} ${lang.to} ${fmtDate(bp.endDate)}</span>
                         <button onclick="removeBlockPeriod(${index})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
                     </div>`;
@@ -694,7 +694,7 @@
 
             filtered.forEach((es, index) => {
                 list.innerHTML += `
-                    <div class="p-3 bg-zinc-950 border border-zinc-800 text-xs rounded-xl flex justify-between items-center">
+                    <div class="p-3 bg-white border border-green-200 text-xs rounded-xl flex justify-between items-center">
                         <span><i class="fa-solid fa-plus-circle text-emerald-400 mr-1"></i> ${es.employee}: ${fmtDate(es.date)} ${lang.timeAt} ${es.time}</span>
                         <button onclick="removeExtraSlot(${index})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
                     </div>`;
@@ -724,7 +724,7 @@
                 if (!btn) return;
                 const on = (l === currentContentLang);
                 btn.className = 'px-3 py-1 text-xs font-bold rounded-lg border ' +
-                    (on ? 'border-sky-500 bg-sky-500 text-zinc-950' : 'border-zinc-700 text-zinc-400');
+                    (on ? 'border-sky-500 bg-sky-500 text-white' : 'border-green-300 text-gray-500');
             });
         }
 

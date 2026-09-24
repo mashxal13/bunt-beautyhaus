@@ -258,13 +258,20 @@
 
             times.sort();
 
-            // Filter out existing bookings
+            // Which slots are already taken by an existing booking?
             const existingBookings = (storeData.bookings || []).filter(b => b.employee === emp && b.date === dateStr);
-            const availableTimes = times.filter(t => !existingBookings.some(b => b.time === t));
+            const takenTimes = existingBookings.map(b => b.time);
 
-            if (availableTimes.length > 0) {
-                availableTimes.forEach(t => {
-                    timeSelect.innerHTML += `<option value="${t}">${t} Uhr</option>`;
+            if (times.length > 0) {
+                times.forEach(t => {
+                    const taken = takenTimes.includes(t);
+                    if (taken) {
+                        // Booked → greyed out, disabled, not selectable
+                        timeSelect.innerHTML += `<option value="" disabled style="color:#9ca3af;">${t} Uhr — belegt</option>`;
+                    } else {
+                        // Free → black, selectable
+                        timeSelect.innerHTML += `<option value="${t}" style="color:#111827;">${t} Uhr</option>`;
+                    }
                 });
             } else {
                 timeSelect.innerHTML = '<option value="">Keine freien Slots an diesem Tag</option>';

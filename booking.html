@@ -80,14 +80,14 @@
         <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4">
             <div>
                 <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblService">Leistung auswählen</label>
-                <select id="bookingService" required onchange="onServiceChange()" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                <select id="bookingService" required onchange="onServiceChange()" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-black">
                     <option value="" data-i18n="optService">-- Leistung wählen --</option>
                 </select>
             </div>
 
             <div>
                 <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblEmployee">Mitarbeiter/in</label>
-                <select id="bookingEmployee" required onchange="updateAvailableTimes()" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                <select id="bookingEmployee" required onchange="updateAvailableTimes()" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-black">
                     <option value="" data-i18n="optEmployee">-- Zuerst Leistung wählen --</option>
                 </select>
             </div>
@@ -95,11 +95,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblDate">Wunschdatum</label>
-                    <input type="date" id="bookingDate" required onchange="updateAvailableTimes()" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <input type="date" id="bookingDate" required onchange="updateAvailableTimes()" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-black">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblTime">Freier Uhrzeit-Slot</label>
-                    <select id="bookingTime" required class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <select id="bookingTime" required class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-black">
                         <option value="" data-i18n="optTime">-- Datum wählen --</option>
                     </select>
                 </div>
@@ -109,17 +109,17 @@
 
             <div>
                 <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblName">Ihr Name</label>
-                <input type="text" id="clientName" required placeholder="Vor- und Nachname" data-i18n-ph="phName" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                <input type="text" id="clientName" required placeholder="Vor- und Nachname" data-i18n-ph="phName" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-black">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblPhone">Telefonnummer</label>
-                    <input type="tel" id="clientPhone" required placeholder="+49 ..." class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <input type="tel" id="clientPhone" required placeholder="+49 ..." class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-black">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="lblEmail">E-Mail</label>
-                    <input type="email" id="clientEmail" required placeholder="name@example.com" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+                    <input type="email" id="clientEmail" required placeholder="name@example.com" class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 text-black">
                 </div>
             </div>
 

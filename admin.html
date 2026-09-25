@@ -679,6 +679,7 @@
             renderBlockedPeriods(isEmp, empName, lang);
             renderExtraSlots(isEmp, empName, lang);
             loadContentFields();
+            loadAboutFields();
         }
 
                 function renderServices(isEmp, empName, lang) {
@@ -768,6 +769,50 @@
             });
             saveData();
             const msg = document.getElementById('contentSavedMsg');
+            if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2000); }
+        }
+
+        // --- Independent "Über uns" editor ---
+        let currentAboutLang = 'de';
+
+        const aboutDefaults = {
+            de: { aboutHeading: "Willkommen bei BUNT Beautyhaus", aboutText: "Wir sind Ihr exklusives Studio für professionelle Beauty-Behandlungen in Achim bei Bremen." },
+            en: { aboutHeading: "Welcome to BUNT Beautyhaus", aboutText: "We are your exclusive studio for professional beauty treatments in Achim near Bremen." },
+            ru: { aboutHeading: "Добро пожаловать в BUNT Beautyhaus", aboutText: "Мы — ваша эксклюзивная студия профессиональных бьюти-процедур в Ахиме под Бременом." },
+            ua: { aboutHeading: "Ласкаво просимо до BUNT Beautyhaus", aboutText: "Ми — ваша ексклюзивна студія професійних б'юті-процедур в Ахімі поблизу Бремена." }
+        };
+
+        function loadAboutFields() {
+            const saved = (storeData.content && storeData.content[currentAboutLang]) || {};
+            const content = Object.assign({}, aboutDefaults[currentAboutLang] || {}, saved);
+            document.querySelectorAll('.about-field').forEach(f => {
+                f.value = content[f.getAttribute('data-about')] || '';
+            });
+            ['de','en','ru','ua'].forEach(l => {
+                const btn = document.getElementById('aLang-' + l);
+                if (!btn) return;
+                const on = (l === currentAboutLang);
+                btn.className = 'px-3 py-1 text-xs font-bold rounded-lg border ' +
+                    (on ? 'border-teal-500 bg-teal-500 text-white' : 'border-green-300 text-gray-500');
+            });
+        }
+
+        function setAboutLang(l) {
+            currentAboutLang = l;
+            loadAboutFields();
+        }
+
+        function saveAbout() {
+            if (!storeData.content) storeData.content = {};
+            if (!storeData.content[currentAboutLang]) storeData.content[currentAboutLang] = {};
+            document.querySelectorAll('.about-field').forEach(f => {
+                const key = f.getAttribute('data-about');
+                const val = f.value.trim();
+                if (val) storeData.content[currentAboutLang][key] = val;
+                else delete storeData.content[currentAboutLang][key];
+            });
+            saveData();
+            const msg = document.getElementById('aboutSavedMsg');
             if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2000); }
         }
 

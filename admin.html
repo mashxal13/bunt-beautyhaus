@@ -203,12 +203,16 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-gray-500 mb-1">Über uns — Bild-URL oder Datei hochladen</label>
-                    <input type="text" id="aboutImageInput" placeholder="https://..." class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-purple-500">
+                    <label class="block text-xs text-gray-500 mb-1">Über uns — Galerie (mehrere Bilder für die Slideshow)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="aboutImageInput" placeholder="Bild-URL einfügen und auf + klicken" class="flex-1 bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-purple-500">
+                        <button type="button" onclick="addAboutImageFromInput()" class="px-4 bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-xl text-sm">+</button>
+                    </div>
                     <div class="flex items-center gap-2 mt-2">
-                        <input type="file" accept="image/*,video/*" onchange="uploadMedia(this, 'aboutImageInput')" class="text-xs text-gray-600">
+                        <input type="file" accept="image/*" onchange="uploadAboutImage(this)" class="text-xs text-gray-600">
                         <span id="aboutUploadMsg" class="text-xs text-purple-600"></span>
                     </div>
+                    <div id="aboutGalleryList" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3"></div>
                 </div>
             </div>
 
@@ -848,14 +852,71 @@
         // --- Photo settings (hero background + about image) ---
         function loadPhotoFields() {
             const h = document.getElementById('heroImageInput');
-            const a = document.getElementById('aboutImageInput');
             if (h) h.value = storeData.heroImage || '';
-            if (a) a.value = storeData.aboutImage || '';
+            // Migrate old single aboutImage into the array once
+            if (!Array.isArray(storeData.aboutImages)) {
+                storeData.aboutImages = storeData.aboutImage ? [storeData.aboutImage] : [];
+            }
+            renderAboutGallery();
+        }
+
+        function renderAboutGallery() {
+            const list = document.getElementById('aboutGalleryList');
+            if (!list) return;
+            list.innerHTML = '';
+            (storeData.aboutImages || []).forEach((url, idx) => {
+                list.innerHTML += `
+                    <div class="relative group">
+                        <img src="${url}" class="w-full h-20 object-cover rounded-lg border border-green-200">
+                        <button type="button" onclick="removeAboutImage(${idx})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs leading-none">×</button>
+                    </div>`;
+            });
+        }
+
+        function addAboutImage(url) {
+            url = (url || '').trim();
+            if (!url) return;
+            if (!Array.isArray(storeData.aboutImages)) storeData.aboutImages = [];
+            storeData.aboutImages.push(url);
+            renderAboutGallery();
+        }
+
+        function addAboutImageFromInput() {
+            const inp = document.getElementById('aboutImageInput');
+            addAboutImage(inp.value);
+            inp.value = '';
+        }
+
+        function removeAboutImage(idx) {
+            storeData.aboutImages.splice(idx, 1);
+            renderAboutGallery();
+        }
+
+        // Upload a chosen file to Supabase, then add its URL to the gallery
+        async function uploadAboutImage(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+            const msg = document.getElementById('aboutUploadMsg');
+            if (msg) msg.textContent = 'Wird hochgeladen...';
+            const safeName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
+            try {
+                const { error } = await supa.storage.from('media').upload(safeName, file, { cacheControl: '3600', upsert: false });
+                if (error) throw error;
+                const { data } = supa.storage.from('media').getPublicUrl(safeName);
+                addAboutImage(data.publicUrl);
+                if (msg) msg.textContent = 'Hochgeladen! ✓';
+                fileInput.value = '';
+            } catch (e) {
+                if (msg) msg.textContent = 'Fehler: ' + e.message;
+                console.error('about upload failed', e);
+            }
         }
 
         function savePhotos() {
             storeData.heroImage = document.getElementById('heroImageInput').value.trim();
-            storeData.aboutImage = document.getElementById('aboutImageInput').value.trim();
+            // aboutImages array is kept up to date by add/remove; ensure it exists
+            if (!Array.isArray(storeData.aboutImages)) storeData.aboutImages = [];
+            delete storeData.aboutImage; // no longer used (replaced by aboutImages)
             saveData();
             const msg = document.getElementById('photosSavedMsg');
             if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2000); }

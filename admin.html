@@ -194,10 +194,22 @@
             <p class="text-xs text-gray-500 mb-4">Fügen Sie einen Bild-Link (URL) für den Startseiten-Hintergrund und den "Über uns"-Bereich ein.</p>
 
             <div class="grid grid-cols-1 gap-3">
-                <div><label class="block text-xs text-gray-500 mb-1">Hintergrundbild (Hero) — Bild-URL</label>
-                    <input type="text" id="heroImageInput" placeholder="https://..." class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-purple-500"></div>
-                <div><label class="block text-xs text-gray-500 mb-1">Über uns — Bild-URL</label>
-                    <input type="text" id="aboutImageInput" placeholder="https://..." class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-purple-500"></div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Hintergrundbild (Hero) — Bild-URL oder Datei hochladen</label>
+                    <input type="text" id="heroImageInput" placeholder="https://..." class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-purple-500">
+                    <div class="flex items-center gap-2 mt-2">
+                        <input type="file" accept="image/*,video/*" onchange="uploadMedia(this, 'heroImageInput')" class="text-xs text-gray-600">
+                        <span id="heroUploadMsg" class="text-xs text-purple-600"></span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Über uns — Bild-URL oder Datei hochladen</label>
+                    <input type="text" id="aboutImageInput" placeholder="https://..." class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-purple-500">
+                    <div class="flex items-center gap-2 mt-2">
+                        <input type="file" accept="image/*,video/*" onchange="uploadMedia(this, 'aboutImageInput')" class="text-xs text-gray-600">
+                        <span id="aboutUploadMsg" class="text-xs text-purple-600"></span>
+                    </div>
+                </div>
             </div>
 
             <button type="button" onclick="savePhotos()" class="mt-4 px-5 py-2.5 bg-purple-500 hover:bg-purple-600 text-white font-bold text-xs rounded-xl"><i class="fa-solid fa-floppy-disk mr-1"></i> Bilder speichern</button>
@@ -847,6 +859,28 @@
             saveData();
             const msg = document.getElementById('photosSavedMsg');
             if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2000); }
+        }
+
+        // Upload a file to Supabase Storage ('media' bucket) and fill the target URL input
+        async function uploadMedia(fileInput, targetInputId) {
+            const file = fileInput.files[0];
+            if (!file) return;
+            const msgId = targetInputId === 'heroImageInput' ? 'heroUploadMsg' : 'aboutUploadMsg';
+            const msg = document.getElementById(msgId);
+            if (msg) msg.textContent = 'Wird hochgeladen...';
+
+            // Unique file name: timestamp + original name (spaces removed)
+            const safeName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
+            try {
+                const { error } = await supa.storage.from('media').upload(safeName, file, { cacheControl: '3600', upsert: false });
+                if (error) throw error;
+                const { data } = supa.storage.from('media').getPublicUrl(safeName);
+                document.getElementById(targetInputId).value = data.publicUrl;
+                if (msg) msg.textContent = 'Hochgeladen! ✓ (Jetzt „Bilder speichern" klicken)';
+            } catch (e) {
+                if (msg) msg.textContent = 'Fehler: ' + e.message;
+                console.error('upload failed', e);
+            }
         }
 
         // 6. Action Handlers

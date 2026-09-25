@@ -121,6 +121,7 @@
     <!-- About / Über uns Section -->
     <section id="about" class="py-20 bg-brand-50 dark:bg-gray-800/40 border-t border-brand-100 dark:border-gray-800">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div id="aboutImageBox"></div>
             <span data-i18n="aboutBadge" class="text-xs uppercase tracking-widest text-brand-600 font-bold mb-2 block">Über uns</span>
             <h2 id="aboutHeading" data-i18n="aboutHeading" class="font-serif text-3xl sm:text-4xl font-bold mb-6 text-bunt-dark dark:text-white">Willkommen bei BUNT Beautyhaus</h2>
             <p id="aboutText" data-i18n="aboutText" class="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
@@ -262,6 +263,18 @@
             // Logo (falls vorhanden)
             if (data.logoUrl) {
                 document.getElementById('logoContainer').innerHTML = `<img src="${data.logoUrl}" class="h-10 w-auto rounded-lg" alt="Logo">`;
+            }
+
+            // Hero-Hintergrundbild (falls vorhanden)
+            if (data.heroImage) {
+                const hero = document.querySelector('.hero-banner');
+                if (hero) hero.style.backgroundImage = `linear-gradient(to right, rgba(20,28,22,0.92), rgba(20,28,22,0.70)), url('${data.heroImage}')`;
+            }
+
+            // Über-uns-Bild (falls vorhanden)
+            if (data.aboutImage) {
+                const box = document.getElementById('aboutImageBox');
+                if (box) box.innerHTML = `<img src="${data.aboutImage}" alt="Über uns" class="w-full max-w-md mx-auto rounded-2xl shadow-lg mb-8">`;
             }
 
             // Leistungen nach Mitarbeiter/in gruppiert (aufklappbar)

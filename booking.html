@@ -268,9 +268,8 @@
 
             times.sort();
 
-            // Which slots are already taken by an existing booking?
-            const existingBookings = (storeData.bookings || []).filter(b => b.employee === emp && b.date === dateStr);
-            const takenTimes = existingBookings.map(b => b.time);
+            // Which slots are already taken? (from public busy_slots view — no personal data)
+            const takenTimes = busySlots.filter(b => b.employee === emp && b.date === dateStr).map(b => b.time);
 
             if (times.length > 0) {
                 times.forEach(t => {
@@ -314,9 +313,17 @@
             // Save booking locally
             const newBooking = { id: Date.now(), ...templateParams, clientName: templateParams.client_name, clientPhone: templateParams.client_phone, clientEmail: templateParams.client_email };
             if (!storeData.bookings) storeData.bookings = [];
-            storeData.bookings.push(newBooking);
-            localStorage.setItem('buntBeautyData', JSON.stringify(storeData));
-            cloudSave(storeData);
+            // Save booking to the secure 'bookings' table (public can insert)
+            supa.from('bookings').insert({
+                service: newBooking.service,
+                employee: newBooking.employee,
+                date: newBooking.date,
+                time: newBooking.time,
+                duration: newBooking.duration,
+                client_name: newBooking.clientName,
+                client_phone: newBooking.clientPhone,
+                client_email: newBooking.clientEmail
+            }).then(({ error }) => { if (error) console.warn('booking insert failed:', error.message); });
 
             // Send notification via EmailJS
             emailjs.send('service_98yq0nk', 'template_cs50x7h', templateParams)
@@ -331,9 +338,14 @@
                 });
         }
 
+        let busySlots = [];
         window.addEventListener('DOMContentLoaded', async () => {
             await cloudLoad();
             storeData = JSON.parse(localStorage.getItem('buntBeautyData')) || storeData;
+            try {
+                const { data } = await supa.from('busy_slots').select('*');
+                busySlots = data || [];
+            } catch (e) { console.warn('busy_slots load failed:', e.message); }
             initPage();
             applyBookingLanguage();
         });

@@ -85,8 +85,10 @@
 
         <!-- Admin Login Form -->
         <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
-            <p class="text-xs text-gray-500 mb-4 text-center" data-i18n="adminPinSub">4-stelligen Admin PIN eingeben</p>
-            <input type="password" id="adminPinInput" maxlength="4" placeholder="••••" class="w-full text-center text-3xl bg-white border border-green-200 rounded-2xl py-3 mb-4 focus:outline-none focus:border-emerald-500 text-black">
+            <p class="text-xs text-zinc-400 mb-4 text-center">Login mit E-Mail & Passwort</p>
+            <input type="email" id="adminEmailInput" required placeholder="E-Mail" class="w-full bg-white border border-green-200 rounded-2xl p-3 mb-3 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
+            <input type="password" id="adminPinInput" required placeholder="Passwort" class="w-full bg-white border border-green-200 rounded-2xl p-3 mb-4 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
+            <input type="password" id="adminPinInput" placeholder="Passwort" class="w-full bg-white border border-green-200 rounded-2xl p-3 mb-4 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
             <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl" data-i18n="loginBtn">Anmelden</button>
         </form>
 
@@ -574,10 +576,14 @@
             renderDashboard();
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (storeData.currentUser) {
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data } = await supa.auth.getSession();
+            if (data.session) {
+                const meta = data.session.user.user_metadata || {};
+                storeData.currentUser = { role: meta.role || 'employee', name: meta.employee_name || 'User' };
                 enterDashboard();
             } else {
+                storeData.currentUser = null;
                 updateUI();
             }
         });
@@ -598,17 +604,16 @@
         }
 
         // 4. Login & Logout
-        function handleAdminLogin(e) {
+        async function handleAdminLogin(e) {
             e.preventDefault();
-            const enteredPin = document.getElementById('adminPinInput').value;
-            const validPin = storeData.adminPin || '1234';  // default until changed
-            if (enteredPin === validPin) {
-                storeData.currentUser = { role: 'admin', name: 'Master Admin' };
-                document.getElementById('adminPinInput').value = '';
-                enterDashboard();
-            } else {
-                showError();
-            }
+            const email = document.getElementById('adminEmailInput').value.trim();
+            const password=[REDACTED_PASSWORD]
+            const { data, error } = await supa.auth.signInWithPassword({ email, password });
+            if (error || !data.session) { showError(); return; }
+            const meta = data.user.user_metadata || {};
+            storeData.currentUser = { role: meta.role || 'employee', name: meta.employee_name || 'User' };
+            document.getElementById('adminPinInput').value = '';
+            enterDashboard();
         }
 
         function handleEmpLogin(e) {
@@ -631,18 +636,32 @@
             document.getElementById('loginError').classList.remove('hidden');
         }
 
-           async function enterDashboard() {
-            document.getElementById('loginCard').classList.add('hidden');
-            document.getElementById('adminDashboard').classList.remove('hidden');
-            const loggedInUser = storeData.currentUser;   // remember who logged in
-            await cloudLoad();
-            storeData = normalizeStore(JSON.parse(localStorage.getItem('buntBeautyData')) || storeData);
-            storeData.currentUser = loggedInUser;          // restore after cloud load
-            localStorage.setItem('buntBeautyData', JSON.stringify(storeData));
-            updateUI();
-        }
+        async function enterDashboard() {
+                    document.getElementById('loginCard').classList.add('hidden');
+                    document.getElementById('adminDashboard').classList.remove('hidden');
+                    const loggedInUser = storeData.currentUser;
+                    await cloudLoad();
+                    storeData = normalizeStore(JSON.parse(localStorage.getItem('buntBeautyData')) || storeData);
+                    storeData.currentUser = loggedInUser;
+                    await loadBookingsFromCloud();
+                    localStorage.setItem('buntBeautyData', JSON.stringify(storeData));
+                    updateUI();
+                }
 
-        function logoutAdmin() {
+                // Fetch bookings from the secure 'bookings' table (admin only)
+                async function loadBookingsFromCloud() {
+                    try {
+                        const { data, error } = await supa.from('bookings').select('*').order('date', { ascending: true });
+                        if (error) throw error;
+                        storeData.bookings = (data || []).map(b => ({
+                            id: b.id, service: b.service, employee: b.employee, date: b.date, time: b.time,
+                            duration: b.duration, clientName: b.client_name, clientPhone: b.client_phone, clientEmail: b.client_email
+                        }));
+                    } catch (e) { console.warn('loadBookings failed:', e.message); }
+                }
+
+        async function logoutAdmin() {
+            await supa.auth.signOut();
             storeData.currentUser = null;
             localStorage.setItem('buntBeautyData', JSON.stringify(storeData));
             document.getElementById('adminDashboard').classList.add('hidden');
@@ -1098,9 +1117,14 @@
             saveData();
         }
 
-        function deleteBooking(index) {
+        async function deleteBooking(index) {
+            const b = storeData.bookings[index];
+            if (b && b.id != null) {
+                const { error } = await supa.from('bookings').delete().eq('id', b.id);
+                if (error) { alert('Löschen fehlgeschlagen: ' + error.message); return; }
+            }
             storeData.bookings.splice(index, 1);
-            saveData();
+            renderDashboard();
         }
     </script>
 </body>

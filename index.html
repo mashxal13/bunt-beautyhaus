@@ -68,11 +68,7 @@
 
             <!-- Dynamic Logo & Title -->
             <a href="#" class="flex items-center group relative">
-                <div id="logoContainer" class="flex items-center">
-                    <div class="px-4 py-1.5 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-serif font-bold text-xl rounded-lg">
-                        BUNT
-                    </div>
-                </div>
+                <div id="logoContainer" class="flex items-center opacity-0 transition-opacity duration-300"></div>
                 <div class="ml-3 hidden sm:block border-l border-brand-300 dark:border-gray-700 pl-3">
                     <span id="displaySiteTitle" class="text-xs font-bold uppercase tracking-widest block text-bunt-dark dark:text-white">BUNT BEAUTYHAUS</span>
                     <span class="text-[10px] text-gray-500 dark:text-gray-400 block">Achim bei Bremen</span>
@@ -267,9 +263,15 @@
                 document.getElementById('heroAboutText').innerText = data.aboutText;
             }
 
-            // Logo (falls vorhanden)
-            if (data.logoUrl) {
-                document.getElementById('logoContainer').innerHTML = `<img src="${data.logoUrl}" class="h-10 w-auto rounded-lg" alt="Logo">`;
+            // Logo (falls vorhanden) — sonst Standard-Badge
+            const logoBox = document.getElementById('logoContainer');
+            if (logoBox) {
+                if (data.logoUrl) {
+                    logoBox.innerHTML = `<img src="${data.logoUrl}" class="h-10 w-auto rounded-lg" alt="Logo">`;
+                } else {
+                    logoBox.innerHTML = `<div class="px-4 py-1.5 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-serif font-bold text-xl rounded-lg">BUNT</div>`;
+                }
+                logoBox.classList.remove('opacity-0');
             }
 
             // Hero-Hintergrundbild (falls vorhanden)

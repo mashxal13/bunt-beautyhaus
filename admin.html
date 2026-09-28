@@ -910,9 +910,9 @@
             if (msg) msg.textContent = 'Wird hochgeladen...';
             const safeName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
             try {
-                const { error } = await supa.storage.from('media').upload(safeName, file, { cacheControl: '3600', upsert: false });
+                const { error } = await supa.storage.from('bunt-beautysaloon-media').upload(safeName, file, { cacheControl: '3600', upsert: false });
                 if (error) throw error;
-                const { data } = supa.storage.from('media').getPublicUrl(safeName);
+                const { data } = supa.storage.from('bunt-beautysaloon-media').getPublicUrl(safeName);
                 addAboutImage(data.publicUrl);
                 if (msg) msg.textContent = 'Hochgeladen! ✓';
                 fileInput.value = '';
@@ -933,7 +933,7 @@
             if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2000); }
         }
 
-        // Upload a file to Supabase Storage ('media' bucket) and fill the target URL input
+        // Upload a file to Supabase Storage ('bunt-beautysaloon-media' bucket) and fill the target URL input
         async function uploadMedia(fileInput, targetInputId) {
             const file = fileInput.files[0];
             if (!file) return;
@@ -944,9 +944,9 @@
             // Unique file name: timestamp + original name (spaces removed)
             const safeName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
             try {
-                const { error } = await supa.storage.from('media').upload(safeName, file, { cacheControl: '3600', upsert: false });
+                const { error } = await supa.storage.from('bunt-beautysaloon-media').upload(safeName, file, { cacheControl: '3600', upsert: false });
                 if (error) throw error;
-                const { data } = supa.storage.from('media').getPublicUrl(safeName);
+                const { data } = supa.storage.from('bunt-beautysaloon-media').getPublicUrl(safeName);
                 document.getElementById(targetInputId).value = data.publicUrl;
                 if (msg) msg.textContent = 'Hochgeladen! ✓ (Jetzt „Bilder speichern" klicken)';
             } catch (e) {

@@ -114,6 +114,19 @@
             </button>
         </header>
 
+        <!-- Change Admin PIN -->
+        <section id="changePinSection" class="bg-green-50 border border-green-200 rounded-2xl p-6 border-l-4 border-l-rose-500">
+            <h2 class="text-xl font-bold mb-1 text-rose-600"><i class="fa-solid fa-lock mr-2"></i> Admin-PIN ändern</h2>
+            <p class="text-xs text-gray-500 mb-4">Ändern Sie den 4-stelligen Admin-PIN. Merken Sie sich den neuen PIN gut!</p>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <input type="password" id="currentPinInput" maxlength="12" placeholder="Aktueller PIN" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-rose-500">
+                <input type="password" id="newPinInput" maxlength="12" placeholder="Neuer PIN" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-rose-500">
+                <input type="password" id="confirmPinInput" maxlength="12" placeholder="Neuer PIN bestätigen" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-rose-500">
+                <button type="button" onclick="changeAdminPin()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl text-xs">PIN ändern</button>
+            </div>
+            <span id="pinChangeMsg" class="text-xs mt-2 block"></span>
+        </section>
+
         <!-- Admin-Only Account Creator -->
         <section id="adminOnlySection" class="bg-green-50 border border-green-200 rounded-2xl p-6 border-l-4 border-l-amber-500">
             <h2 class="text-xl font-bold mb-1 text-amber-400"><i class="fa-solid fa-key mr-2"></i> <span data-i18n="accManageTitle">Mitarbeiter-Zugänge verwalten</span></h2>
@@ -587,7 +600,9 @@
         // 4. Login & Logout
         function handleAdminLogin(e) {
             e.preventDefault();
-            if (document.getElementById('adminPinInput').value === '1234') {
+            const enteredPin = document.getElementById('adminPinInput').value;
+            const validPin = storeData.adminPin || '1234';  // default until changed
+            if (enteredPin === validPin) {
                 storeData.currentUser = { role: 'admin', name: 'Master Admin' };
                 document.getElementById('adminPinInput').value = '';
                 enterDashboard();
@@ -956,6 +971,37 @@
         }
 
         // 6. Action Handlers
+        function changeAdminPin() {
+            const cur = document.getElementById('currentPinInput').value;
+            const neu = document.getElementById('newPinInput').value.trim();
+            const conf = document.getElementById('confirmPinInput').value.trim();
+            const msg = document.getElementById('pinChangeMsg');
+            const validPin = storeData.adminPin || '1234';
+
+            if (cur !== validPin) {
+                msg.textContent = 'Aktueller PIN ist falsch.';
+                msg.className = 'text-xs mt-2 block text-red-500';
+                return;
+            }
+            if (neu.length < 4) {
+                msg.textContent = 'Neuer PIN muss mindestens 4 Zeichen haben.';
+                msg.className = 'text-xs mt-2 block text-red-500';
+                return;
+            }
+            if (neu !== conf) {
+                msg.textContent = 'Die neuen PINs stimmen nicht überein.';
+                msg.className = 'text-xs mt-2 block text-red-500';
+                return;
+            }
+            storeData.adminPin = neu;
+            saveData();
+            document.getElementById('currentPinInput').value = '';
+            document.getElementById('newPinInput').value = '';
+            document.getElementById('confirmPinInput').value = '';
+            msg.textContent = 'PIN erfolgreich geändert! ✓';
+            msg.className = 'text-xs mt-2 block text-emerald-600';
+        }
+
         function addAccount() {
             const employeeName = document.getElementById('accEmpName').value.trim();
             const username = document.getElementById('accUsername').value.trim();

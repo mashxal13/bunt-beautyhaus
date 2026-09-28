@@ -910,7 +910,7 @@
             if (msg) msg.textContent = 'Wird hochgeladen...';
             const safeName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
             try {
-                const { error } = await supa.storage.from('bunt-beautysaloon-media').upload(safeName, file, { cacheControl: '3600', upsert: false });
+                const { error } = await supa.storage.from('bunt-beautysaloon-media').upload(safeName, file, { cacheControl: '3600', upsert: false, contentType: file.type || 'image/png' });
                 if (error) throw error;
                 const { data } = supa.storage.from('bunt-beautysaloon-media').getPublicUrl(safeName);
                 addAboutImage(data.publicUrl);
@@ -944,7 +944,7 @@
             // Unique file name: timestamp + original name (spaces removed)
             const safeName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
             try {
-                const { error } = await supa.storage.from('bunt-beautysaloon-media').upload(safeName, file, { cacheControl: '3600', upsert: false });
+                const { error } = await supa.storage.from('bunt-beautysaloon-media').upload(safeName, file, { cacheControl: '3600', upsert: false, contentType: file.type || 'image/png' });
                 if (error) throw error;
                 const { data } = supa.storage.from('bunt-beautysaloon-media').getPublicUrl(safeName);
                 document.getElementById(targetInputId).value = data.publicUrl;

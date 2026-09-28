@@ -171,6 +171,16 @@
                 serviceSelect.innerHTML += `<option value="${s.title}" data-duration="${duration}" data-assigned="${s.assignedTo}">${s.title} (${s.price} • ${duration} Min)</option>`;
             });
 
+            // Pre-select service from URL (?service=...) when coming from the homepage
+            const preService = new URLSearchParams(window.location.search).get('service');
+            if (preService) {
+                const sel = document.getElementById('bookingService');
+                for (let i = 0; i < sel.options.length; i++) {
+                    if (sel.options[i].value === preService) { sel.selectedIndex = i; break; }
+                }
+                if (sel.value) onServiceChange();
+            }
+
             // Set minimum date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('bookingDate').min = today;

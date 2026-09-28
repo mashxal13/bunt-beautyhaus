@@ -161,6 +161,7 @@
                 heroWelcome: "Willkommen im",
                 heroSubText: "Ihr exklusives Studio für professionelles Nageldesign, Maniküre & Pediküre, Wimpern- & Augenbrauenlifting.",
                 servicesBadge: "Angebote & Preise",
+                cardBook: "Jetzt buchen →",
                 servicesHeading: "Behandlungen & Preise"
             },
             en: {
@@ -173,6 +174,7 @@
                 heroWelcome: "Welcome to",
                 heroSubText: "Your exclusive studio for professional nail design, manicure & pedicure, lash & brow lifting.",
                 servicesBadge: "Offers & Pricing",
+                cardBook: "Book now →",
                 servicesHeading: "Treatments & Prices"
             },
             ru: {
@@ -185,6 +187,7 @@
                 heroWelcome: "Добро пожаловать в",
                 heroSubText: "Ваша эксклюзивная студия профессионального дизайна ногтей, маникюра и педикюра, ламинирования ресниц и бровей.",
                 servicesBadge: "Предложения и цены",
+                cardBook: "Записаться →",
                 servicesHeading: "Услуги и цены"
             },
             ua: {
@@ -197,6 +200,7 @@
                 heroWelcome: "Ласкаво просимо до",
                 heroSubText: "Ваша ексклюзивна студія професійного дизайну нігтів, манікюру та педикюру, ламінування вій та брів.",
                 servicesBadge: "Пропозиції та ціни",
+                cardBook: "Записатися →",
                 servicesHeading: "Послуги та ціни"
             }
         };
@@ -313,17 +317,20 @@
                     const services = groups[emp];
                     const panelId = 'emp-panel-' + idx;
                     const cards = services.map(service => `
-                        <div class="p-5 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col justify-between">
+                        <a href="booking.html?service=${encodeURIComponent(service.title)}" class="group p-5 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-brand-300 transition-all flex flex-col justify-between cursor-pointer">
                             <div>
-                                <h4 class="font-bold text-base mb-1">${service.title}</h4>
+                                <h4 class="font-bold text-base mb-1 group-hover:text-brand-600">${service.title}</h4>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">${service.desc || ''}</p>
                             </div>
-                            <div class="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-700">
-                                <span class="text-brand-600 dark:text-brand-400 font-bold text-sm">${service.price}</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400">${service.duration || 30} Min</span>
+                            <div>
+                                <div class="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-700">
+                                    <span class="text-brand-600 dark:text-brand-400 font-bold text-sm">${service.price}</span>
+                                    <span class="text-[10px] text-gray-500 dark:text-gray-400">${service.duration || 30} Min</span>
+                                </div>
+                                <span class="mt-3 inline-flex items-center gap-1 text-xs font-bold text-brand-600 group-hover:underline" data-i18n="cardBook">Jetzt buchen →</span>
                             </div>
-                        </div>
-                    `).join('');
+                        </a>
+                    `).join(
 
                     container.innerHTML += `
                         <div class="col-span-1 md:col-span-3">

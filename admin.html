@@ -195,6 +195,14 @@
 
             <div class="grid grid-cols-1 gap-3">
                 <div>
+                    <label class="block text-xs text-gray-500 mb-1">Logo — Bild-URL oder Datei hochladen</label>
+                    <input type="text" id="logoImageInput" placeholder="https://..." class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-purple-500">
+                    <div class="flex items-center gap-2 mt-2">
+                        <input type="file" accept="image/*" onchange="uploadMedia(this, 'logoImageInput')" class="text-xs text-gray-600">
+                        <span id="logoUploadMsg" class="text-xs text-purple-600"></span>
+                    </div>
+                </div>
+                <div>
                     <label class="block text-xs text-gray-500 mb-1">Hintergrundbild (Hero) — Bild-URL oder Datei hochladen</label>
                     <input type="text" id="heroImageInput" placeholder="https://..." class="w-full bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-purple-500">
                     <div class="flex items-center gap-2 mt-2">
@@ -851,6 +859,8 @@
 
         // --- Photo settings (hero background + about image) ---
         function loadPhotoFields() {
+            const logo = document.getElementById('logoImageInput');
+            if (logo) logo.value = storeData.logoUrl || '';
             const h = document.getElementById('heroImageInput');
             if (h) h.value = storeData.heroImage || '';
             // Migrate old single aboutImage into the array once
@@ -913,6 +923,7 @@
         }
 
         function savePhotos() {
+            storeData.logoUrl = document.getElementById('logoImageInput').value.trim();
             storeData.heroImage = document.getElementById('heroImageInput').value.trim();
             // aboutImages array is kept up to date by add/remove; ensure it exists
             if (!Array.isArray(storeData.aboutImages)) storeData.aboutImages = [];
@@ -926,7 +937,7 @@
         async function uploadMedia(fileInput, targetInputId) {
             const file = fileInput.files[0];
             if (!file) return;
-            const msgId = targetInputId === 'heroImageInput' ? 'heroUploadMsg' : 'aboutUploadMsg';
+            const msgId = targetInputId === 'heroImageInput' ? 'heroUploadMsg' : (targetInputId === 'logoImageInput' ? 'logoUploadMsg' : 'aboutUploadMsg');
             const msg = document.getElementById(msgId);
             if (msg) msg.textContent = 'Wird hochgeladen...';
 

@@ -57,7 +57,7 @@
         }
         /* About slideshow fade */
         .about-slide { transition: opacity 0.8s ease-in-out; opacity: 1; }
-        .about-slide.about-hidden { opacity: 0; position: absolute; inset: 0; pointer-events: none; }
+        .about-slide.about-hidden { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body class="font-sans bg-bunt-lightBg text-bunt-charcoal dark:bg-bunt-dark dark:text-gray-100 transition-colors duration-300">
@@ -280,8 +280,8 @@
             if (box && imgs.length) {
                 box.innerHTML = `
                     <div class="relative w-full max-w-2xl mx-auto mb-8">
-                        <div class="relative rounded-2xl shadow-lg overflow-hidden">
-                            ${imgs.map((u,i) => `<img src="${u}" alt="Über uns ${i+1}" class="about-slide w-full h-auto rounded-2xl ${i===0?'':'about-hidden'}">`).join('')}
+                        <div class="relative rounded-2xl shadow-lg overflow-hidden bg-gray-100 dark:bg-gray-800" style="height:420px;">
+                            ${imgs.map((u,i) => `<img src="${u}" alt="Über uns ${i+1}" class="about-slide absolute inset-0 w-full h-full object-contain rounded-2xl ${i===0?'':'about-hidden'}">`).join('')}
                         </div>
                         ${imgs.length > 1 ? `
                         <button type="button" onclick="aboutSlide(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 w-9 h-9 rounded-full shadow flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>

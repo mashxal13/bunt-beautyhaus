@@ -693,7 +693,7 @@
             (storeData.employees || []).forEach((emp, index) => {
                 empList.innerHTML += `
                     <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-green-200 text-xs">
-                        <span><i class="fa-solid fa-user-check text-emerald-400 mr-2"></i>${emp}</span>
+                        <span><i class="fa-solid fa-user-check text-emerald-400 mr-2"></i>${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${storeData.employeeEmails[emp]})</span>` : ''}</span>
                         ${!isEmp ? `<button onclick="removeEmployee(${index})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </li>`;
                 if (!isEmp) {
@@ -1061,8 +1061,13 @@
             // 1. Add the name to the employee list (for services/holidays/bookings)
             if (!storeData.employees.includes(name)) {
                 storeData.employees.push(name);
-                saveData();
             }
+            // Remember the email for this employee (used when deleting their login)
+            if (email) {
+                if (!storeData.employeeEmails) storeData.employeeEmails = {};
+                storeData.employeeEmails[name] = email;
+            }
+            saveData();
 
             // 2. If an email was given, send the Supabase invite
             if (email) {
@@ -1089,7 +1094,33 @@
             document.getElementById('newEmployeeEmail').value = '';
         }
 
-        function removeEmployee(index) {
+        async function removeEmployee(index) {
+            const name = storeData.employees[index];
+            const email = (storeData.employeeEmails || {})[name];
+
+            if (!confirm('Mitarbeiter "' + name + '" wirklich löschen? Auch der Login wird entfernt.')) return;
+
+            // Delete the Supabase login account (if we have their email)
+            if (email) {
+                try {
+                    const { data: sess } = await supa.auth.getSession();
+                    const res = await fetch(SUPABASE_URL + '/functions/v1/delete-employee', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + (sess.session ? sess.session.access_token : SUPABASE_KEY)
+                        },
+                        body: JSON.stringify({ email })
+                    });
+                    const out = await res.json();
+                    if (!res.ok || out.error) throw new Error(out.error || 'Fehler');
+                } catch (e) {
+                    alert('Login-Löschung fehlgeschlagen: ' + e.message);
+                    return; // stop — don't remove locally if the account deletion failed
+                }
+                delete storeData.employeeEmails[name];
+            }
+
             storeData.employees.splice(index, 1);
             saveData();
         }

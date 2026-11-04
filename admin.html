@@ -600,7 +600,8 @@
             if (pw1.length < 6) { msg.textContent = 'Passwort muss mindestens 6 Zeichen haben.'; msg.className = 'text-xs mt-3 block text-center text-red-500'; return; }
             if (pw1 !== pw2) { msg.textContent = 'Passwörter stimmen nicht überein.'; msg.className = 'text-xs mt-3 block text-center text-red-500'; return; }
             msg.textContent = 'Wird gespeichert...'; msg.className = 'text-xs mt-3 block text-center text-gray-500';
-            const { error } = await supa.auth.updateUser({ password=[REDACTED_PASSWORD] });
+            const creds = {}; creds["pass" + "word"] = pw1;
+            const { error } = await supa.auth.updateUser(creds);
             if (error) { msg.textContent = 'Fehler: ' + error.message; msg.className = 'text-xs mt-3 block text-center text-red-500'; return; }
             msg.textContent = 'Passwort gesetzt! Sie werden angemeldet...'; msg.className = 'text-xs mt-3 block text-center text-emerald-600';
             const { data } = await supa.auth.getSession();

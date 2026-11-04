@@ -127,20 +127,6 @@
             <span id="pwChangeMsg" class="text-xs mt-2 block"></span>
         </section>
 
-        <!-- Admin-Only Account Creator -->
-        <section id="adminOnlySection" class="bg-green-50 border border-green-200 rounded-2xl p-6 border-l-4 border-l-amber-500">
-            <h2 class="text-xl font-bold mb-1 text-amber-400"><i class="fa-solid fa-key mr-2"></i> <span data-i18n="accManageTitle">Mitarbeiter-Zugänge verwalten</span></h2>
-            <p class="text-xs text-gray-500 mb-6" data-i18n="accManageSub">Erstellen Sie Logins für Ihr Team.</p>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-                <input type="text" id="accEmpName" data-i18n-ph="accEmpNamePh" placeholder="Mitarbeiter Name (z.B. Anna)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-amber-500">
-                <input type="text" id="accUsername" data-i18n-ph="accUserPh" placeholder="Benutzername (z.B. anna)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-amber-500">
-                <input type="password" id="accPin" data-i18n-ph="accPinPh" placeholder="4-stelliger PIN" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-amber-500">
-                <button onclick="addAccount()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-xs" data-i18n="createAccBtn">Zugang Erstellen</button>
-            </div>
-            <div id="userAccountsList" class="space-y-2"></div>
-        </section>
-
                 <!-- Website Content Editor -->
         <section id="contentEditorSection" class="bg-green-50 border border-green-200 rounded-2xl p-6 border-l-4 border-l-sky-500">
             <h2 class="text-xl font-bold mb-1 text-sky-400"><i class="fa-solid fa-language mr-2"></i> Website-Texte bearbeiten</h2>
@@ -308,10 +294,13 @@
         <!-- Employees List -->
         <section id="employeeAdminSection" class="bg-green-50 border border-green-200 rounded-2xl p-6">
             <h2 class="text-xl font-bold mb-4 text-emerald-400"><i class="fa-solid fa-users mr-2"></i> <span data-i18n="employeesTitle">Mitarbeiter Verwalten</span></h2>
-            <div id="addEmpControls" class="flex gap-2 mb-4">
-                <input type="text" id="newEmployeeName" data-i18n-ph="newEmpNamePh" placeholder="Name des Mitarbeiters" class="flex-1 bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
-                <button onclick="addEmployee()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl" data-i18n="addEmpBtn">Hinzufügen</button>
+            <p class="text-xs text-gray-500 mb-4">Hier verwalten Sie die <b>Namen</b> der Mitarbeiter (für Leistungen, Urlaub & Buchungen). Den <b>Login</b> (E-Mail + Passwort) legen Sie in Supabase an — siehe Anleitung.</p>
+            <div id="addEmpControls" class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
+                <input type="text" id="newEmployeeName" data-i18n-ph="newEmpNamePh" placeholder="Name des Mitarbeiters" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
+                <input type="email" id="newEmployeeEmail" placeholder="E-Mail des Mitarbeiters" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
+                <button onclick="addEmployee()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl">Hinzufügen & Einladen</button>
             </div>
+            <p id="inviteMsg" class="text-xs mb-4"></p>
             <ul id="employeeList" class="space-y-2"></ul>
         </section>
 
@@ -1063,13 +1052,41 @@
             saveData();
         }
 
-        function addEmployee() {
+        async function addEmployee() {
             const name = document.getElementById('newEmployeeName').value.trim();
-            if (name && !storeData.employees.includes(name)) {
+            const email = document.getElementById('newEmployeeEmail').value.trim();
+            const msg = document.getElementById('inviteMsg');
+            if (!name) return;
+
+            // 1. Add the name to the employee list (for services/holidays/bookings)
+            if (!storeData.employees.includes(name)) {
                 storeData.employees.push(name);
-                document.getElementById('newEmployeeName').value = '';
                 saveData();
             }
+
+            // 2. If an email was given, send the Supabase invite
+            if (email) {
+                if (msg) { msg.textContent = 'Einladung wird gesendet...'; msg.className = 'text-xs mb-4 text-gray-500'; }
+                try {
+                    const { data: sess } = await supa.auth.getSession();
+                    const res = await fetch(SUPABASE_URL + '/functions/v1/invite-employee', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + (sess.session ? sess.session.access_token : SUPABASE_KEY)
+                        },
+                        body: JSON.stringify({ name, email })
+                    });
+                    const out = await res.json();
+                    if (!res.ok || out.error) throw new Error(out.error || 'Fehler');
+                    if (msg) { msg.textContent = 'Einladung an ' + email + ' gesendet! ✓'; msg.className = 'text-xs mb-4 text-emerald-600'; }
+                } catch (e) {
+                    if (msg) { msg.textContent = 'Einladung fehlgeschlagen: ' + e.message; msg.className = 'text-xs mb-4 text-red-500'; }
+                }
+            }
+
+            document.getElementById('newEmployeeName').value = '';
+            document.getElementById('newEmployeeEmail').value = '';
         }
 
         function removeEmployee(index) {

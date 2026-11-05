@@ -41,7 +41,8 @@ const INVITE_HASH = window.location.hash || ''; // save invite-link info before 
                 // Write the whole object to the cloud
         async function cloudSave(obj) {
             try {
-                const { error } = await supa.from('site_data').update({ data: obj, updated_at: new Date().toISOString() }).eq('id', 1);
+const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adminPin; delete clean.userAccounts;
+                const { error } = await supa.from('site_data').update({ data: clean, updated_at: new Date().toISOString() }).eq('id', 1);
                 if (error) throw error;
             } catch (e) { console.warn('cloudSave failed:', e.message); }
         }

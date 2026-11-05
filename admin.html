@@ -24,6 +24,7 @@
     <script>
         const SUPABASE_URL = "https://zuuuorscgbtjrrqinbjf.supabase.co";
         const SUPABASE_KEY = "sb_publishable_Izpxk6P6UEtm6f3WdTIo8Q_OAb1t8-5";
+const INVITE_HASH = window.location.hash || ''; // save invite-link info before Supabase reads it
         const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // Read the shared row from the cloud
@@ -575,7 +576,11 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             // If opened from an invite / recovery link, show the set-password screen
-            const hash = window.location.hash || '';
+            const hash = INVITE_HASH;
+            if (hash.includes('error=')) {
+                alert('Der Einladungslink ist ungültig oder abgelaufen. Bitte eine neue Einladung anfordern.');
+                history.replaceState(null, '', window.location.pathname);
+            }
             if (hash.includes('type=invite') || hash.includes('type=recovery') || hash.includes('type=signup')) {
                 document.getElementById('loginCard').classList.add('hidden');
                 document.getElementById('inviteCard').classList.remove('hidden');
@@ -668,6 +673,7 @@
                     storeData = normalizeStore(JSON.parse(localStorage.getItem('buntBeautyData')) || storeData);
                     storeData.currentUser = loggedInUser;
                     await loadBookingsFromCloud();
+                    await syncEmployeesFromAuth();
                     localStorage.setItem('buntBeautyData', JSON.stringify(storeData));
                     updateUI();
                 }
@@ -730,7 +736,7 @@
             (storeData.employees || []).forEach((emp, index) => {
                 empList.innerHTML += `
                     <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-green-200 text-xs">
-                        <span><i class="fa-solid fa-user-check text-emerald-400 mr-2"></i>${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${storeData.employeeEmails[emp]})</span>` : ''}</span>
+${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${storeData.employeeEmails[emp]})</span>` : ''}${empStatus[emp] ? ` <span class="ml-1 px-1.5 py-0.5 rounded ${empStatus[emp]==='aktiv' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${empStatus[emp]}</span>` : ''}</span>
                         ${!isEmp ? `<button onclick="removeEmployee(${index})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </li>`;
                 if (!isEmp) {
@@ -1089,44 +1095,69 @@
             saveData();
         }
 
+        // ---- Employee management (Supabase Auth via Edge Function) ----
+        let empStatus = {}; // name -> 'aktiv' | 'eingeladen'
+
+        async function callEmp(action, payload) {
+            const { data: sess } = await supa.auth.getSession();
+            if (!sess.session) throw new Error('Nicht angemeldet');
+            const res = await fetch(SUPABASE_URL + '/functions/v1/manage-employee', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sess.session.access_token },
+                body: JSON.stringify(Object.assign({ action }, payload || {}))
+            });
+            const out = await res.json().catch(() => ({}));
+            if (!res.ok || out.error) throw new Error(out.error || ('HTTP ' + res.status));
+            return out;
+        }
+
+        // Supabase is the source of truth: rebuild the employee list from real accounts
+        async function syncEmployeesFromAuth() {
+            if (!storeData.currentUser || storeData.currentUser.role !== 'admin') return;
+            try {
+                const out = await callEmp('list');
+                const names = [], emails = {};
+                empStatus = {};
+                (out.users || []).forEach(u => {
+                    if (!names.includes(u.name)) names.push(u.name);
+                    emails[u.name] = u.email;
+                    empStatus[u.name] = u.confirmed ? 'aktiv' : 'eingeladen';
+                });
+                storeData.employees = names;
+                storeData.employeeEmails = emails;
+                cloudSave(storeData);
+            } catch (e) { console.warn('syncEmployees failed:', e.message); }
+        }
+
         async function addEmployee() {
             const name = document.getElementById('newEmployeeName').value.trim();
             const email = document.getElementById('newEmployeeEmail').value.trim();
             const msg = document.getElementById('inviteMsg');
-            if (!name) return;
-
-            // 1. If an email was given, send the invite FIRST — only save the name if it succeeds
-            if (email) {
-                if (msg) { msg.textContent = 'Einladung wird gesendet...'; msg.className = 'text-xs mb-4 text-gray-500'; }
-                try {
-                    const { data: sess } = await supa.auth.getSession();
-                    const res = await fetch(SUPABASE_URL + '/functions/v1/invite-employee', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + (sess.session ? sess.session.access_token : SUPABASE_KEY)
-                        },
-                        body: JSON.stringify({ name, email })
-                    });
-                    const out = await res.json();
-                    if (!res.ok || out.error) throw new Error(out.error || 'Fehler');
-                    if (msg) { msg.textContent = 'Einladung an ' + email + ' gesendet! ✓'; msg.className = 'text-xs mb-4 text-emerald-600'; }
-                } catch (e) {
-                    if (msg) { msg.textContent = 'Einladung fehlgeschlagen: ' + e.message; msg.className = 'text-xs mb-4 text-red-500'; }
-                    return; // stop — don't add a phantom employee if the invite failed
-                }
-                if (!storeData.employeeEmails) storeData.employeeEmails = {};
-                storeData.employeeEmails[name] = email;
-            }
-
-            // 2. Save the name (invite succeeded, or no email was given)
-            if (!storeData.employees.includes(name)) {
-                storeData.employees.push(name);
-            }
-            saveData();
-
+            const show = (t, c) => { if (msg) { msg.textContent = t; msg.className = 'text-xs mb-4 ' + c; } };
+            if (!name || !email) { show('Bitte Name und E-Mail eingeben.', 'text-red-500'); return; }
+            show('Einladung wird gesendet...', 'text-gray-500');
+            try {
+                await callEmp('invite', { name, email });
+            } catch (e) { show('Einladung fehlgeschlagen: ' + e.message, 'text-red-500'); return; }
             document.getElementById('newEmployeeName').value = '';
             document.getElementById('newEmployeeEmail').value = '';
+            await syncEmployeesFromAuth();
+            renderDashboard();
+            show('Einladung an ' + email + ' gesendet! ✓', 'text-emerald-600');
+        }
+
+        async function removeEmployee(index) {
+            const name = storeData.employees[index];
+            const email = (storeData.employeeEmails || {})[name];
+            if (!window.confirm('Mitarbeiter "' + name + '" wirklich löschen? Der Login wird ebenfalls entfernt.')) return;
+            try {
+                if (email) await callEmp('delete', { email });
+            } catch (e) { alert('Löschen fehlgeschlagen: ' + e.message); return; }
+            storeData.employees.splice(index, 1);
+            if (storeData.employeeEmails) delete storeData.employeeEmails[name];
+            saveData();
+            await syncEmployeesFromAuth();
+            renderDashboard();
         }
 
         async function removeEmployee(index) {

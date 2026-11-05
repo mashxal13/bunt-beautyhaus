@@ -1095,18 +1095,7 @@
             const msg = document.getElementById('inviteMsg');
             if (!name) return;
 
-            // 1. Add the name to the employee list (for services/holidays/bookings)
-            if (!storeData.employees.includes(name)) {
-                storeData.employees.push(name);
-            }
-            // Remember the email for this employee (used when deleting their login)
-            if (email) {
-                if (!storeData.employeeEmails) storeData.employeeEmails = {};
-                storeData.employeeEmails[name] = email;
-            }
-            saveData();
-
-            // 2. If an email was given, send the Supabase invite
+            // 1. If an email was given, send the invite FIRST — only save the name if it succeeds
             if (email) {
                 if (msg) { msg.textContent = 'Einladung wird gesendet...'; msg.className = 'text-xs mb-4 text-gray-500'; }
                 try {
@@ -1124,8 +1113,17 @@
                     if (msg) { msg.textContent = 'Einladung an ' + email + ' gesendet! ✓'; msg.className = 'text-xs mb-4 text-emerald-600'; }
                 } catch (e) {
                     if (msg) { msg.textContent = 'Einladung fehlgeschlagen: ' + e.message; msg.className = 'text-xs mb-4 text-red-500'; }
+                    return; // stop — don't add a phantom employee if the invite failed
                 }
+                if (!storeData.employeeEmails) storeData.employeeEmails = {};
+                storeData.employeeEmails[name] = email;
             }
+
+            // 2. Save the name (invite succeeded, or no email was given)
+            if (!storeData.employees.includes(name)) {
+                storeData.employees.push(name);
+            }
+            saveData();
 
             document.getElementById('newEmployeeName').value = '';
             document.getElementById('newEmployeeEmail').value = '';

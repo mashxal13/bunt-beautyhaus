@@ -1148,12 +1148,14 @@
                         body: JSON.stringify({ email })
                     });
                     const out = await res.json();
-                    if (!res.ok || out.error) throw new Error(out.error || 'Fehler');
+                    // "not found" is OK — the account is already gone, so just continue removing the name
+                    if (!res.ok || (out.error && !/nicht gefunden|not found/i.test(out.error))) {
+                        throw new Error(out.error || 'Fehler');
+                    }
                 } catch (e) {
-                    alert('Login-Löschung fehlgeschlagen: ' + e.message);
-                    return; // stop — don't remove locally if the account deletion failed
+                    if (!confirm('Login-Löschung fehlgeschlagen (' + e.message + '). Mitarbeiter trotzdem aus der Liste entfernen?')) return;
                 }
-                delete storeData.employeeEmails[name];
+                if (storeData.employeeEmails) delete storeData.employeeEmails[name];
             }
 
             storeData.employees.splice(index, 1);

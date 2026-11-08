@@ -317,6 +317,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
                 <button onclick="addEmployee()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl">Hinzufügen & Einladen</button>
             </div>
             <p id="inviteMsg" class="text-xs mb-4"></p>
+            <div id="empCounter" class="flex gap-2 mb-3 text-xs"></div>
             <ul id="employeeList" class="space-y-2"></ul>
         </section>
 
@@ -752,7 +753,14 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
                 empList.innerHTML += `
                     <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-green-200 text-xs">
 ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${storeData.employeeEmails[emp]})</span>` : ''}${empStatus[emp] ? ` <span class="ml-1 px-1.5 py-0.5 rounded ${empStatus[emp]==='aktiv' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${empStatus[emp]}</span>` : ''}</span>
-                        ${!isEmp ? `<button onclick="removeEmployee(${index})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        ${!isEmp ? `<span class="flex items-center gap-3">
+                            ${empSelf[emp] ? '<span class="px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">Admin (Sie)</span>' : `
+                            <select onchange="changeRole(${index}, this.value)" class="border border-green-200 rounded-lg p-1 text-xs">
+                                <option value="employee" ${empRole[emp] !== 'admin' ? 'selected' : ''}>Mitarbeiter</option>
+                                <option value="admin" ${empRole[emp] === 'admin' ? 'selected' : ''}>Admin</option>
+                            </select>
+                            <button onclick="removeEmployee(${index})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>`}
+                        </span>` : ''}
                     </li>`;
                 if (!isEmp) {
                     empSelect.innerHTML += `<option value="${emp}">${lang.assignTo}${emp}</option>`;
@@ -760,6 +768,18 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
                     extraEmpSelect.innerHTML += `<option value="${emp}">${emp}</option>`;
                 }
             });
+
+            // Registered users counter
+            const counter = document.getElementById('empCounter');
+            if (counter) {
+                const all = storeData.employees || [];
+                const nAdmin = all.filter(n => empRole[n] === 'admin').length;
+                counter.classList.toggle('hidden', isEmp);
+                counter.innerHTML = `
+                    <span class="px-2 py-1 rounded-lg bg-white border border-green-200">Gesamt: <b>${all.length}</b></span>
+                    <span class="px-2 py-1 rounded-lg bg-purple-100 text-purple-700">Admins: <b>${nAdmin}</b></span>
+                    <span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700">Mitarbeiter: <b>${all.length - nAdmin}</b></span>`;
+            }
 
             // Account List Render
             const accList = document.getElementById('userAccountsList');
@@ -1146,6 +1166,8 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
 
         // ---- Employee management (Supabase Auth via Edge Function) ----
         let empStatus = {}; // name -> 'aktiv' | 'eingeladen'
+        let empRole = {};   // name -> 'admin' | 'employee'
+        let empSelf = {};   // name -> true if it's the logged-in admin
 
         async function callEmp(action, payload) {
             const { data: sess } = await supa.auth.getSession();
@@ -1171,6 +1193,8 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
                     if (!names.includes(u.name)) names.push(u.name);
                     emails[u.name] = u.email;
                     empStatus[u.name] = u.confirmed ? 'aktiv' : 'eingeladen';
+                    empRole[u.name] = u.role;
+                    empSelf[u.name] = !!u.self;
                 });
                 storeData.employees = names;
                 storeData.employeeEmails = emails;
@@ -1195,6 +1219,18 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             await syncEmployeesFromAuth();
             renderDashboard();
             show('Einladung an ' + email + ' gesendet! ✓', 'text-emerald-600');
+        }
+
+        async function changeRole(index, role) {
+            const name = storeData.employees[index];
+            const email = (storeData.employeeEmails || {})[name];
+            if (!email) { alert('Keine E-Mail für ' + name + ' gefunden.'); return; }
+            const label = role === 'admin' ? 'Admin (volle Rechte)' : 'Mitarbeiter';
+            if (!confirm('Rolle von "' + name + '" ändern zu: ' + label + '?')) { renderDashboard(); return; }
+            try { await callEmp('setRole', { email, role }); }
+            catch (e) { alert('Ändern fehlgeschlagen: ' + e.message); }
+            await syncEmployeesFromAuth();
+            renderDashboard();
         }
 
         async function removeEmployee(index) {

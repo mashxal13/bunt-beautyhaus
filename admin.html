@@ -1241,7 +1241,7 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             const name = storeData.employees[index];
             const email = (storeData.employeeEmails || {})[name];
 
-            if (!confirm('Mitarbeiter "' + name + '" wirklich löschen? Auch der Login wird entfernt.')) return;
+            if (!confirm('"' + name + '" endgültig löschen?\n\nEs werden ALLE Daten gelöscht: Login, Leistungen, Termine, Urlaub und Zusatz-Slots.\nDas kann nicht rückgängig gemacht werden.')) return;
 
             // Delete the Supabase login account (if we have their email)
             if (email) {
@@ -1253,7 +1253,7 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
                             'Content-Type': 'application/json',
                             'Authorization': 'Bearer ' + (sess.session ? sess.session.access_token : SUPABASE_KEY)
                         },
-                        body: JSON.stringify({ action: 'delete', email })
+                        body: JSON.stringify({ action: 'delete', email, name })
                     });
                     const out = await res.json();
                     // "not found" is OK — the account is already gone, so just continue removing the name
@@ -1266,8 +1266,12 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
                 if (storeData.employeeEmails) delete storeData.employeeEmails[name];
             }
 
-            storeData.employees.splice(index, 1);
-            saveData();
+            await cloudLoad();
+            const me = storeData.currentUser;
+            storeData = normalizeStore(JSON.parse(localStorage.getItem('buntBeautyData')) || storeData);
+            storeData.currentUser = me;
+            await loadServicesFromCloud();
+            await loadBookingsFromCloud();
             await syncEmployeesFromAuth();
             renderDashboard();
         }

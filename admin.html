@@ -60,6 +60,11 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             return s;
         }
 
+        // Make user-typed text safe before putting it into HTML
+        function esc(v) {
+            return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
         // Format yyyy-mm-dd -> dd.mm.yyyy for display
         function fmtDate(d) {
             if (!d) return '';
@@ -596,8 +601,14 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             }
             const { data } = await supa.auth.getSession();
             if (data.session) {
-                const meta = data.session.user.user_metadata || {};
-                storeData.currentUser = { role: meta.role || 'employee', name: meta.employee_name || 'User' };
+                const meta = data.session.user.app_metadata || {};
+                if (meta.role !== 'admin' && meta.role !== 'employee') {
+                    await supa.auth.signOut();
+                    storeData.currentUser = null;
+                    updateUI();
+                    return;
+                }
+                storeData.currentUser = { role: meta.role, name: meta.employee_name || 'User' };
                 enterDashboard();
             } else {
                 storeData.currentUser = null;
@@ -815,8 +826,8 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
                     <div class="p-4 bg-white border border-green-200 rounded-xl flex justify-between items-center">
                         <div>
                             <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-semibold">${fmtDate(b.date)} ${lang.timeAt} ${b.time} (${b.duration || 30} Min)</span>
-                            <h4 class="font-bold text-white text-sm mt-2">${b.service} <span class="text-gray-400">(${b.employee})</span></h4>
-                            <p class="text-xs text-gray-500 mt-1">${b.clientName} • ${b.clientPhone} • ${b.clientEmail}</p>
+ text-sm mt-2">${esc(b.service)} <span class="text-gray-400">(${esc(b.employee)})</span></h4>
+                            <p class="text-xs text-gray-500 mt-1">${esc(b.clientName)} • ${esc(b.clientPhone)} • ${esc(b.clientEmail)}</p>
                         </div>
                         <button onclick="deleteBooking(${index})" class="text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-lg hover:bg-red-500/20">${lang.cancelBtn}</button>
                     </div>`;

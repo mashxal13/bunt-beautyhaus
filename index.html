@@ -43,7 +43,15 @@
             try {
                 const { data, error } = await supa.from('site_data').select('data').eq('id', 1).single();
                 if (error) throw error;
-                if (data && data.data) localStorage.setItem('buntBeautyData', JSON.stringify(data.data));
+                if (data && data.data) {
+                    const site = data.data;
+                    const { data: sv } = await supa.from('services').select('*').order('id');
+                    if (sv) site.services = sv.map(s => ({
+                        id: s.id, title: s.title, price: s.price, duration: s.duration,
+                        desc: s.description || '', assignedTo: s.assigned_to, category: s.category || ''
+                    }));
+                    localStorage.setItem('buntBeautyData', JSON.stringify(site));
+                }
             } catch (e) { console.warn('cloudLoad failed, using local copy:', e.message); }
         }
     </script>

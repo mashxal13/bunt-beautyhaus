@@ -343,7 +343,7 @@
             await cloudLoad();
             storeData = JSON.parse(localStorage.getItem('buntBeautyData')) || storeData;
             try {
-                const { data } = await supa.from('busy_slots').select('*');
+                const { data } = await supa.rpc('get_busy_slots');
                 busySlots = data || [];
             } catch (e) { console.warn('busy_slots load failed:', e.message); }
             initPage();

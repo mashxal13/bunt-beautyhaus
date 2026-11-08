@@ -56,6 +56,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             });
             if (typeof s.content !== 'object' || s.content === null) s.content = {};
             if (!('currentUser' in s)) s.currentUser = null;
+            s.userAccounts = []; delete s.adminPin;
             return s;
         }
 
@@ -90,14 +91,15 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
     <!-- Login Container -->
     <div id="loginCard" class="max-w-md mx-auto my-12 p-8 bg-green-50 border border-green-200 rounded-3xl shadow-2xl">
         <!-- Tabs -->
-        <div class="flex border-b border-green-200 mb-6">
+        <div class="hidden flex border-b border-green-200 mb-6">
             <button id="tabAdminBtn" onclick="switchLoginTab('admin')" class="w-1/2 pb-3 font-semibold text-sm border-b-2 border-emerald-500 text-emerald-400" data-i18n="adminLoginTab">Admin Login</button>
             <button id="tabEmpBtn" onclick="switchLoginTab('employee')" class="w-1/2 pb-3 font-semibold text-sm border-b-2 border-transparent text-gray-400" data-i18n="empLoginTab">Mitarbeiter Login</button>
         </div>
 
         <!-- Admin Login Form -->
         <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
-            <p class="text-xs text-zinc-400 mb-4 text-center">Login mit E-Mail & Passwort</p>
+            <h2 class="text-lg font-bold text-emerald-500 text-center mb-1">Team Login</h2>
+            <p class="text-xs text-zinc-400 mb-4 text-center">Admins & Mitarbeiter: Login mit E-Mail & Passwort</p>
             <input type="email" id="adminEmailInput" required placeholder="E-Mail" class="w-full bg-white border border-green-200 rounded-2xl p-3 mb-3 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
                     <input type="password" id="adminPinInput" required placeholder="Passwort" class="w-full bg-white border border-green-200 rounded-2xl p-3 mb-4 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
             <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl" data-i18n="loginBtn">Anmelden</button>
@@ -656,7 +658,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             const user = document.getElementById('empUserInput').value.trim();
             const pin = document.getElementById('empPinInput').value.trim();
             
-            const acc = storeData.userAccounts.find(a => a.username === user && a.pin === pin);
+            const acc = null; // PIN login disabled — use email & password
             if (acc) {
                 storeData.currentUser = { role: 'employee', name: acc.employeeName };
                 document.getElementById('empUserInput').value = '';

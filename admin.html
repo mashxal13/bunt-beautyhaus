@@ -1199,7 +1199,11 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
                 storeData.employees = names;
                 storeData.employeeEmails = emails;
                 cloudSave(storeData);
-            } catch (e) { console.warn('syncEmployees failed:', e.message); }
+            } catch (e) {
+                console.warn('syncEmployees failed:', e.message);
+                const m = document.getElementById('inviteMsg');
+                if (m) { m.textContent = 'Mitarbeiterliste konnte nicht geladen werden: ' + e.message; m.className = 'text-xs mb-4 text-red-500'; }
+            }
         }
 
         async function addEmployee() {

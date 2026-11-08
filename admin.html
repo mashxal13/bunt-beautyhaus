@@ -41,7 +41,7 @@ const INVITE_HASH = window.location.hash || ''; // save invite-link info before 
                 // Write the whole object to the cloud
         async function cloudSave(obj) {
             try {
-const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adminPin; delete clean.userAccounts;
+const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adminPin; delete clean.userAccounts; delete clean.services;
                 const { error } = await supa.from('site_data').update({ data: clean, updated_at: new Date().toISOString() }).eq('id', 1);
                 if (error) throw error;
             } catch (e) { console.warn('cloudSave failed:', e.message); }
@@ -307,9 +307,13 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
         <section id="employeeAdminSection" class="bg-green-50 border border-green-200 rounded-2xl p-6">
             <h2 class="text-xl font-bold mb-4 text-emerald-400"><i class="fa-solid fa-users mr-2"></i> <span data-i18n="employeesTitle">Mitarbeiter Verwalten</span></h2>
             <p class="text-xs text-gray-500 mb-4">Hier verwalten Sie die <b>Namen</b> der Mitarbeiter (für Leistungen, Urlaub & Buchungen). Den <b>Login</b> (E-Mail + Passwort) legen Sie in Supabase an — siehe Anleitung.</p>
-            <div id="addEmpControls" class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
+            <div id="addEmpControls" class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2">
                 <input type="text" id="newEmployeeName" data-i18n-ph="newEmpNamePh" placeholder="Name des Mitarbeiters" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
                 <input type="email" id="newEmployeeEmail" placeholder="E-Mail des Mitarbeiters" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
+                <select id="newEmployeeRole" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
+                    <option value="employee">Mitarbeiter</option>
+                    <option value="admin">Admin</option>
+                </select>
                 <button onclick="addEmployee()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl">Hinzufügen & Einladen</button>
             </div>
             <p id="inviteMsg" class="text-xs mb-4"></p>
@@ -611,7 +615,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             if (error) { msg.textContent = 'Fehler: ' + error.message; msg.className = 'text-xs mt-3 block text-center text-red-500'; return; }
             msg.textContent = 'Passwort gesetzt! Sie werden angemeldet...'; msg.className = 'text-xs mt-3 block text-center text-emerald-600';
             const { data } = await supa.auth.getSession();
-            const meta = data.session ? data.session.user.user_metadata || {} : {};
+            const meta = data.session ? Object.assign({}, data.session.user.user_metadata, data.session.user.app_metadata) : {};
             storeData.currentUser = { role: meta.role || 'employee', name: meta.employee_name || 'User' };
             setTimeout(enterDashboard, 1000);
         }
@@ -640,7 +644,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             creds["pass" + "word"] = pass;
             const { data, error } = await supa.auth.signInWithPassword(creds);
             if (error || !data.session) { showError(); return; }
-            const meta = data.user.user_metadata || {};
+            const meta = Object.assign({}, data.user.user_metadata, data.user.app_metadata);
             storeData.currentUser = { role: meta.role || 'employee', name: meta.employee_name || 'User' };
             document.getElementById('adminPinInput').value = '';
             enterDashboard();
@@ -674,6 +678,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
                     storeData = normalizeStore(JSON.parse(localStorage.getItem('buntBeautyData')) || storeData);
                     storeData.currentUser = loggedInUser;
                     await loadBookingsFromCloud();
+                    await loadServicesFromCloud();
                     await syncEmployeesFromAuth();
                     localStorage.setItem('buntBeautyData', JSON.stringify(storeData));
                     updateUI();
@@ -722,6 +727,15 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
 
             const addEmpControls = document.getElementById('addEmpControls');
             if (addEmpControls) addEmpControls.classList.toggle('hidden', isEmp);
+
+            // Sections only the admin may see (services stay visible for employees)
+            ['contentEditorSection','aboutEditorSection','photoSettingsSection','employeeAdminSection'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.classList.toggle('hidden', isEmp);
+            });
+            ['blockedPeriodsList','extraSlotsList'].forEach(id => {
+                const el = document.getElementById(id); const sec = el && el.closest('section');
+                if (sec) sec.classList.toggle('hidden', isEmp);
+            });
 
             // Populate Dropdowns
             const empList = document.getElementById('employeeList');
@@ -796,8 +810,11 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             filtered.forEach(s => {
                 servList.innerHTML += `
                     <div class="p-4 bg-white border border-green-200 rounded-xl relative">
-                        ${!isEmp ? `<button onclick="removeService(${s.id})" class="absolute top-3 right-3 text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>` : ''}
-                        <h4 class="font-bold text-white text-sm">${s.title}</h4>
+                        ${(!isEmp || s.assignedTo === empName) ? `<div class="absolute top-3 right-3 flex gap-3">
+                            <button onclick="editService(${s.id})" class="text-sky-500 hover:text-sky-400" title="Bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="removeService(${s.id})" class="text-red-400 hover:text-red-300" title="Löschen"><i class="fa-solid fa-trash"></i></button>
+                        </div>` : ''}
+                        <h4 class="font-bold text-gray-800 text-sm">${s.title}</h4>
                         <p class="text-xs text-emerald-400 mt-0.5">${s.price} • ${s.duration || 30} Min</p>
                         <p class="text-xs text-gray-500 mt-2">${s.desc}</p>
                     </div>`;
@@ -1072,28 +1089,59 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             saveData();
         }
 
-        function addService() {
+        async function loadServicesFromCloud() {
+            try {
+                const { data, error } = await supa.from('services').select('*').order('id');
+                if (error) throw error;
+                storeData.services = (data || []).map(s => ({
+                    id: s.id, title: s.title, price: s.price, duration: s.duration,
+                    desc: s.description || '', assignedTo: s.assigned_to, category: s.category || ''
+                }));
+            } catch (e) { console.warn('loadServices failed:', e.message); }
+        }
+
+        async function addService() {
             const title = document.getElementById('serviceTitle').value.trim();
             const price = document.getElementById('servicePrice').value.trim();
-            const duration = document.getElementById('serviceDuration').value.trim();
+            const duration = parseInt(document.getElementById('serviceDuration').value) || 30;
             const desc = document.getElementById('serviceDesc').value.trim();
             const assignedTo = document.getElementById('serviceEmployee').value;
             const category = document.getElementById('serviceCategory').value.trim();
+            if (!title || !price) { alert('Bitte Titel und Preis eingeben.'); return; }
 
-            if (title && price && duration) {
-                storeData.services.push({ id: Date.now(), title, price, duration, desc, assignedTo, category });
-                document.getElementById('serviceCategory').value = '';
-                document.getElementById('serviceTitle').value = '';
-                document.getElementById('servicePrice').value = '';
-                document.getElementById('serviceDuration').value = '';
-                document.getElementById('serviceDesc').value = '';
-                saveData();
-            }
+            const { error } = await supa.from('services').insert({
+                title, price, duration, description: desc, assigned_to: assignedTo, category
+            });
+            if (error) { alert('Speichern fehlgeschlagen: ' + error.message); return; }
+
+            ['serviceCategory','serviceTitle','servicePrice','serviceDuration','serviceDesc']
+                .forEach(id => document.getElementById(id).value = '');
+            await loadServicesFromCloud();
+            renderDashboard();
         }
 
-        function removeService(id) {
-            storeData.services = storeData.services.filter(s => s.id !== id);
-            saveData();
+        async function editService(id) {
+            const s = (storeData.services || []).find(x => x.id === id);
+            if (!s) return;
+            const price = prompt('Neuer Preis für "' + s.title + '":', s.price);
+            if (price === null) return;
+            const duration = prompt('Dauer in Minuten:', s.duration);
+            if (duration === null) return;
+
+            const { error } = await supa.from('services')
+                .update({ price: price.trim(), duration: parseInt(duration) || s.duration })
+                .eq('id', id);
+            if (error) { alert('Ändern fehlgeschlagen: ' + error.message); return; }
+            await loadServicesFromCloud();
+            renderDashboard();
+        }
+
+        async function removeService(id) {
+            if (!confirm('Diese Leistung wirklich löschen?')) return;
+            const { error } = await supa.from('services').delete().eq('id', id);
+            if (error) { alert('Löschen fehlgeschlagen: ' + error.message); return; }
+            await loadServicesFromCloud();
+            renderDashboard();
         }
 
         // ---- Employee management (Supabase Auth via Edge Function) ----
@@ -1136,29 +1184,17 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             const msg = document.getElementById('inviteMsg');
             const show = (t, c) => { if (msg) { msg.textContent = t; msg.className = 'text-xs mb-4 ' + c; } };
             if (!name || !email) { show('Bitte Name und E-Mail eingeben.', 'text-red-500'); return; }
+            const role = document.getElementById('newEmployeeRole').value;
+            if (role === 'admin' && !confirm('"' + name + '" bekommt volle Admin-Rechte. Fortfahren?')) return;
             show('Einladung wird gesendet...', 'text-gray-500');
             try {
-                await callEmp('invite', { name, email });
+                await callEmp('invite', { name, email, role });
             } catch (e) { show('Einladung fehlgeschlagen: ' + e.message, 'text-red-500'); return; }
             document.getElementById('newEmployeeName').value = '';
             document.getElementById('newEmployeeEmail').value = '';
             await syncEmployeesFromAuth();
             renderDashboard();
             show('Einladung an ' + email + ' gesendet! ✓', 'text-emerald-600');
-        }
-
-        async function removeEmployee(index) {
-            const name = storeData.employees[index];
-            const email = (storeData.employeeEmails || {})[name];
-            if (!window.confirm('Mitarbeiter "' + name + '" wirklich löschen? Der Login wird ebenfalls entfernt.')) return;
-            try {
-                if (email) await callEmp('delete', { email });
-            } catch (e) { alert('Löschen fehlgeschlagen: ' + e.message); return; }
-            storeData.employees.splice(index, 1);
-            if (storeData.employeeEmails) delete storeData.employeeEmails[name];
-            saveData();
-            await syncEmployeesFromAuth();
-            renderDashboard();
         }
 
         async function removeEmployee(index) {
@@ -1171,13 +1207,13 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             if (email) {
                 try {
                     const { data: sess } = await supa.auth.getSession();
-                    const res = await fetch(SUPABASE_URL + '/functions/v1/delete-employee', {
+                    const res = await fetch(SUPABASE_URL + '/functions/v1/manage-employee', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': 'Bearer ' + (sess.session ? sess.session.access_token : SUPABASE_KEY)
                         },
-                        body: JSON.stringify({ email })
+                        body: JSON.stringify({ action: 'delete', email })
                     });
                     const out = await res.json();
                     // "not found" is OK — the account is already gone, so just continue removing the name
@@ -1192,6 +1228,8 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
 
             storeData.employees.splice(index, 1);
             saveData();
+            await syncEmployeesFromAuth();
+            renderDashboard();
         }
 
         function addBlockPeriod() {

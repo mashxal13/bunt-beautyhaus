@@ -752,7 +752,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             (storeData.employees || []).forEach((emp, index) => {
                 empList.innerHTML += `
                     <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-green-200 text-xs">
-${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${storeData.employeeEmails[emp]})</span>` : ''}${empStatus[emp] ? ` <span class="ml-1 px-1.5 py-0.5 rounded ${empStatus[emp]==='aktiv' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${empStatus[emp]}</span>` : ''}</span>
+                        <span class="flex items-center gap-2"><b>${emp}</b>${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${storeData.employeeEmails[emp]})</span>` : ''}${empStatus[emp] ? ` <span class="ml-1 px-1.5 py-0.5 rounded ${empStatus[emp]==='aktiv' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${empStatus[emp]}</span>` : ''}</span>
                         ${!isEmp ? `<span class="flex items-center gap-3">
                             ${empSelf[emp] ? '<span class="px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">Admin (Sie)</span>' : `
                             <select onchange="changeRole(${index}, this.value)" class="border border-green-200 rounded-lg p-1 text-xs">
@@ -999,7 +999,8 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             inp.value = '';
         }
 
-        function removeAboutImage(idx) {
+        async function removeAboutImage(idx) {
+            if (!await confirmDialog('Dieses Bild wirklich entfernen?')) return;
             storeData.aboutImages.splice(idx, 1);
             renderAboutGallery();
         }
@@ -1157,7 +1158,7 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
         }
 
         async function removeService(id) {
-            if (!confirm('Diese Leistung wirklich löschen?')) return;
+            if (!await confirmDialog('Diese Leistung wirklich löschen?')) return;
             const { error } = await supa.from('services').delete().eq('id', id);
             if (error) { alert('Löschen fehlgeschlagen: ' + error.message); return; }
             await loadServicesFromCloud();
@@ -1213,7 +1214,7 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             const show = (t, c) => { if (msg) { msg.textContent = t; msg.className = 'text-xs mb-4 ' + c; } };
             if (!name || !email) { show('Bitte Name und E-Mail eingeben.', 'text-red-500'); return; }
             const role = document.getElementById('newEmployeeRole').value;
-            if (role === 'admin' && !confirm('"' + name + '" bekommt volle Admin-Rechte. Fortfahren?')) return;
+            if (role === 'admin' && !await confirmDialog('"' + name + '" bekommt volle Admin-Rechte. Fortfahren?')) return;
             show('Einladung wird gesendet...', 'text-gray-500');
             try {
                 await callEmp('invite', { name, email, role });
@@ -1230,7 +1231,7 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             const email = (storeData.employeeEmails || {})[name];
             if (!email) { alert('Keine E-Mail für ' + name + ' gefunden.'); return; }
             const label = role === 'admin' ? 'Admin (volle Rechte)' : 'Mitarbeiter';
-            if (!confirm('Rolle von "' + name + '" ändern zu: ' + label + '?')) { renderDashboard(); return; }
+            if (!await confirmDialog('Rolle von "' + name + '" ändern zu: ' + label + '?')) { renderDashboard(); return; }
             try { await callEmp('setRole', { email, role }); }
             catch (e) { alert('Ändern fehlgeschlagen: ' + e.message); }
             await syncEmployeesFromAuth();
@@ -1241,7 +1242,7 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             const name = storeData.employees[index];
             const email = (storeData.employeeEmails || {})[name];
 
-            if (!confirm('"' + name + '" endgültig löschen?\n\nEs werden ALLE Daten gelöscht: Login, Leistungen, Termine, Urlaub und Zusatz-Slots.\nDas kann nicht rückgängig gemacht werden.')) return;
+            if (!await confirmDialog('"' + name + '" endgültig löschen?\n\nEs werden ALLE Daten gelöscht: Login, Leistungen, Termine, Urlaub und Zusatz-Slots.\nDas kann nicht rückgängig gemacht werden.')) return;
 
             // Delete the Supabase login account (if we have their email)
             if (email) {
@@ -1261,7 +1262,7 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
                         throw new Error(out.error || 'Fehler');
                     }
                 } catch (e) {
-                    if (!confirm('Login-Löschung fehlgeschlagen (' + e.message + '). Mitarbeiter trotzdem aus der Liste entfernen?')) return;
+                    if (!await confirmDialog('Login-Löschung fehlgeschlagen (' + e.message + '). Mitarbeiter trotzdem aus der Liste entfernen?')) return;
                 }
                 if (storeData.employeeEmails) delete storeData.employeeEmails[name];
             }
@@ -1289,7 +1290,8 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             }
         }
 
-        function removeBlockPeriod(index) {
+        async function removeBlockPeriod(index) {
+            if (!await confirmDialog('Diesen Urlaub / gesperrten Zeitraum wirklich löschen?')) return;
             storeData.blockedPeriods.splice(index, 1);
             saveData();
         }
@@ -1307,19 +1309,62 @@ ${emp}${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${s
             }
         }
 
-        function removeExtraSlot(index) {
+        async function removeExtraSlot(index) {
+            if (!await confirmDialog('Diesen Zusatz-Slot wirklich löschen?')) return;
             storeData.extraSlots.splice(index, 1);
             saveData();
         }
 
         async function deleteBooking(index) {
             const b = storeData.bookings[index];
+            if (!await confirmDialog('Termin' + (b && b.clientName ? ' von ' + b.clientName : '') + ' wirklich löschen?')) return;
             if (b && b.id != null) {
                 const { error } = await supa.from('bookings').delete().eq('id', b.id);
                 if (error) { alert('Löschen fehlgeschlagen: ' + error.message); return; }
             }
             storeData.bookings.splice(index, 1);
             renderDashboard();
+        }
+    </script>
+    <!-- Custom confirm dialog -->
+    <div id="confirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div class="bg-white border border-green-200 rounded-2xl shadow-xl max-w-md w-full p-6">
+            <div class="flex items-start gap-4">
+                <div id="confirmIcon" class="shrink-0 w-11 h-11 rounded-full flex items-center justify-center"></div>
+                <div class="flex-1">
+                    <h3 id="confirmTitle" class="font-bold text-gray-800 text-lg mb-1"></h3>
+                    <p id="confirmText" class="text-sm text-gray-500" style="white-space: pre-line"></p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button id="confirmCancel" class="px-5 py-2.5 bg-white border border-green-200 hover:bg-green-50 text-gray-600 font-bold text-xs rounded-xl">Abbrechen</button>
+                <button id="confirmOk" class="px-5 py-2.5 text-white font-bold text-xs rounded-xl"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmDialog(message) {
+            return new Promise(resolve => {
+                const modal = document.getElementById('confirmModal');
+                const danger = /lösch|entfern/i.test(message);
+                const parts = message.split('\n');
+                document.getElementById('confirmTitle').textContent = parts[0];
+                document.getElementById('confirmText').textContent = parts.slice(1).join('\n').trim();
+                document.getElementById('confirmIcon').className = 'shrink-0 w-11 h-11 rounded-full flex items-center justify-center ' + (danger ? 'bg-red-100 text-red-500' : 'bg-emerald-100 text-emerald-600');
+                document.getElementById('confirmIcon').innerHTML = danger ? '<i class="fa-solid fa-trash"></i>' : '<i class="fa-solid fa-circle-question"></i>';
+                const ok = document.getElementById('confirmOk');
+                ok.textContent = danger ? 'Löschen' : 'Bestätigen';
+                ok.className = 'px-5 py-2.5 text-white font-bold text-xs rounded-xl ' + (danger ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-500 hover:bg-emerald-600');
+                const close = val => { modal.classList.add('hidden'); document.removeEventListener('keydown', onKey); resolve(val); };
+                const onKey = e => { if (e.key === 'Escape') close(false); if (e.key === 'Enter') close(true); };
+                ok.onclick = () => close(true);
+                document.getElementById('confirmCancel').onclick = () => close(false);
+                modal.onclick = e => { if (e.target === modal) close(false); };
+                document.addEventListener('keydown', onKey);
+                modal.classList.remove('hidden');
+                ok.focus();
+            });
         }
     </script>
 </body>

@@ -343,6 +343,14 @@
             await cloudLoad();
             storeData = JSON.parse(localStorage.getItem('buntBeautyData')) || storeData;
             try {
+                const { data, error } = await supa.from('services').select('*').order('id');
+                if (error) throw error;
+                storeData.services = (data || []).map(s => ({
+                    id: s.id, title: s.title, price: s.price, duration: s.duration,
+                    desc: s.description || '', assignedTo: s.assigned_to, category: s.category || ''
+                }));
+            } catch (e) { console.warn('services load failed:', e.message); }
+            try {
                 const { data } = await supa.rpc('get_busy_slots');
                 busySlots = data || [];
             } catch (e) { console.warn('busy_slots load failed:', e.message); }

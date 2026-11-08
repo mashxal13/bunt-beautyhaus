@@ -113,7 +113,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl" data-i18n="loginBtn">Anmelden</button>
         </form>
 
-        <p id="loginError" class="text-red-400 text-xs mt-3 text-center hidden" data-i18n="loginError">Zugangsdaten falsch.</p>
+        <p id="loginError" class="text-red-400 text-xs mt-3 text-center hidden" data-i18n="loginError">Zugangsdaten falsch oder kein Team-Zugang.</p>
     </div>
 
     <!-- Admin Dashboard -->
@@ -618,8 +618,9 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             if (error) { msg.textContent = 'Fehler: ' + error.message; msg.className = 'text-xs mt-3 block text-center text-red-500'; return; }
             msg.textContent = 'Passwort gesetzt! Sie werden angemeldet...'; msg.className = 'text-xs mt-3 block text-center text-emerald-600';
             const { data } = await supa.auth.getSession();
-            const meta = data.session ? Object.assign({}, data.session.user.user_metadata, data.session.user.app_metadata) : {};
-            storeData.currentUser = { role: meta.role || 'employee', name: meta.employee_name || 'User' };
+            const meta = data.session ? (data.session.user.app_metadata || {}) : {};
+            if (meta.role !== 'admin' && meta.role !== 'employee') { await supa.auth.signOut(); location.reload(); return; }
+            storeData.currentUser = { role: meta.role, name: meta.employee_name || 'User' };
             setTimeout(enterDashboard, 1000);
         }
 
@@ -647,8 +648,13 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             creds["pass" + "word"] = pass;
             const { data, error } = await supa.auth.signInWithPassword(creds);
             if (error || !data.session) { showError(); return; }
-            const meta = Object.assign({}, data.user.user_metadata, data.user.app_metadata);
-            storeData.currentUser = { role: meta.role || 'employee', name: meta.employee_name || 'User' };
+            const meta = data.user.app_metadata || {};
+            if (meta.role !== 'admin' && meta.role !== 'employee') {
+                await supa.auth.signOut();
+                showError();
+                return;
+            }
+            storeData.currentUser = { role: meta.role, name: meta.employee_name || 'User' };
             document.getElementById('adminPinInput').value = '';
             enterDashboard();
         }

@@ -256,6 +256,10 @@
             });
         }
 
+        function esc(v) {
+            return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
         function loadDynamicData() {
             const data = JSON.parse(localStorage.getItem('buntBeautyData'));
             if (!data) return;
@@ -311,6 +315,7 @@
 
             // Leistungen nach Mitarbeiter/in gruppiert (aufklappbar)
             const container = document.getElementById('dynamicServicesContainer');
+            if (liveServices) data.services = liveServices;
             if (container && data.services) {
                 container.innerHTML = '';
 
@@ -405,8 +410,17 @@
             }
         }
 
+        let liveServices = null;
         window.addEventListener('DOMContentLoaded', async () => {
             await cloudLoad();
+            try {
+                const { data, error } = await supa.from('services').select('*').order('id');
+                if (error) throw error;
+                liveServices = (data || []).map(s => ({
+                    id: s.id, title: s.title, price: s.price, duration: s.duration,
+                    desc: s.description || '', assignedTo: s.assigned_to, category: s.category || ''
+                }));
+            } catch (e) { console.warn('services load failed:', e.message); }
             rebuildTranslations();
             loadDynamicData();
             updatePageLanguage();

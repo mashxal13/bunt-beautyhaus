@@ -21,6 +21,8 @@
 
     <!-- Supabase Cloud Backend -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales-all.global.min.js"></script>
     <script>
         const SUPABASE_URL = "https://zuuuorscgbtjrrqinbjf.supabase.co";
         const SUPABASE_KEY = "sb_publishable_Izpxk6P6UEtm6f3WdTIo8Q_OAb1t8-5";
@@ -261,7 +263,10 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
         <!-- Bookings List -->
         <section class="bg-green-50 border border-green-200 rounded-2xl p-6">
             <h2 class="text-xl font-bold mb-4 text-emerald-400"><i class="fa-solid fa-calendar-check mr-2"></i> <span data-i18n="bookingsTitle">Eingegangene Termine</span></h2>
-            <div id="bookingsList" class="space-y-3"><p class="text-xs text-gray-400" data-i18n="noBookings">Keine neuen Termine vorhanden.</p></div>
+            <div id="bookingCalendar" class="bg-white border border-green-200 rounded-xl p-3 mb-4 text-xs"></div>
+            <details class="mb-2"><summary class="text-xs text-gray-500 cursor-pointer">Als Liste anzeigen</summary>
+            <div id="bookingsList" class="space-y-3 mt-3"><p class="text-xs text-gray-400" data-i18n="noBookings">Keine neuen Termine vorhanden.</p></div>
+            </details>
         </section>
 
         <!-- Services Management -->
@@ -852,6 +857,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
                 ? (storeData.bookings || []).filter(b => b.employee === empName)
                 : (storeData.bookings || []);
 
+            renderCalendar(filteredBookings);
             const bookingsList = document.getElementById('bookingsList');
             bookingsList.innerHTML = filteredBookings.length ? '' : `<p class="text-xs text-gray-400">${lang.noBookings}</p>`;
             
@@ -1307,6 +1313,56 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             saveData();
             const msg = document.getElementById('contactSavedMsg');
             if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2000); }
+        }
+
+        let bookingCal = null;
+        const calColors = ['#52B771','#3B82F6','#A855F7','#F59E0B','#EC4899','#14B8A6','#EF4444','#6366F1'];
+
+        function renderCalendar(list) {
+            const el = document.getElementById('bookingCalendar');
+            if (!el || !window.FullCalendar) return;
+            const emps = [...new Set((storeData.bookings || []).map(b => b.employee))].sort();
+            const events = list.map(b => {
+                const start = new Date(b.date + 'T' + b.time);
+                const end = new Date(start.getTime() + (parseInt(b.duration) || 30) * 60000);
+                const color = calColors[emps.indexOf(b.employee) % calColors.length];
+                return {
+                    title: b.service + ' – ' + b.clientName,
+                    start, end, backgroundColor: color, borderColor: color,
+                    extendedProps: { idx: storeData.bookings.indexOf(b), b }
+                };
+            });
+            if (!bookingCal) {
+                bookingCal = new FullCalendar.Calendar(el, {
+                    locale: currentLang === 'ua' ? 'uk' : (currentLang || 'de'),
+                    initialView: window.innerWidth < 768 ? 'listWeek' : 'timeGridWeek',
+                    headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridDay,timeGridWeek,dayGridMonth,listWeek' },
+                    slotMinTime: '08:00:00', slotMaxTime: '20:00:00',
+                    allDaySlot: false, nowIndicator: true, height: 'auto', firstDay: 1,
+                    eventClick: async info => {
+                        const { idx, b } = info.event.extendedProps;
+                        const ok = await confirmDialog(
+                            b.service + ' (' + b.employee + ')\n' +
+                            fmtDate(b.date) + ', ' + b.time + ' Uhr · ' + (b.duration || 30) + ' Min\n\n' +
+                            b.clientName + '\n' + b.clientPhone + '\n' + b.clientEmail +
+                            '\n\nDiesen Termin löschen?');
+                        if (ok) await deleteBookingNoAsk(idx);
+                    }
+                });
+                bookingCal.render();
+            }
+            bookingCal.removeAllEvents();
+            bookingCal.addEventSource(events);
+        }
+
+        async function deleteBookingNoAsk(index) {
+            const b = storeData.bookings[index];
+            if (b && b.id != null) {
+                const { error } = await supa.from('bookings').delete().eq('id', b.id);
+                if (error) { alert('Löschen fehlgeschlagen: ' + error.message); return; }
+            }
+            storeData.bookings.splice(index, 1);
+            renderDashboard();
         }
 
         async function changeRole(index, role) {

@@ -329,7 +329,17 @@
                 client_name: newBooking.clientName,
                 client_phone: newBooking.clientPhone,
                 client_email: newBooking.clientEmail
-            }).then(({ error }) => { if (error) console.warn('booking insert failed:', error.message); });
+            }).then(({ error }) => {
+                if (error) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Termin verbindlich anfragen';
+                    const taken = error.code === '23505';
+                    alert(taken
+                        ? 'Diese Uhrzeit wurde gerade von jemand anderem gebucht. Bitte wählen Sie eine andere Zeit.'
+                        : 'Buchung fehlgeschlagen. Bitte versuchen Sie es erneut.');
+                    if (taken) location.reload();
+                    return;
+                }
 
             // Send notification via EmailJS
             emailjs.send('service_98yq0nk', 'template_cs50x7h', templateParams)
@@ -342,6 +352,7 @@
                     document.getElementById('bookingForm').classList.add('hidden');
                     document.getElementById('successMessage').classList.remove('hidden');
                 });
+            });
         }
 
         let busySlots = [];

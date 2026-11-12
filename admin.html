@@ -278,7 +278,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
                 <h3 class="text-sm font-bold text-emerald-600 mb-3"><i class="fa-solid fa-folder-plus mr-1"></i> Kategorien</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                     <input type="text" id="newCategoryName" placeholder="Name (z.B. Manicure by Natalie)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
-                    <select id="newCategoryParent" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500"></select>
+                    <select id="newCategoryParent" title="Übergeordnete Kategorie (für Unterkategorie)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500"></select>
                     <button onclick="addCategory()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl">Kategorie erstellen</button>
                 </div>
                 <div id="categoryList" class="flex flex-col items-start gap-1"></div>
@@ -287,7 +287,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             <div class="grid grid-cols-1 md:grid-cols-6 gap-3 mb-4">
                 <select id="serviceCategory" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500"></select>
                 <input type="text" id="serviceTitle" data-i18n-ph="servTitlePh" placeholder="Titel (z.B. Maniküre)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
-                <input type="text" id="servicePrice" data-i18n-ph="servPricePh" placeholder="Preis (z.B. ab 35,00 €)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
+                <input type="text" id="servicePrice" data-i18n-ph="servPricePh" placeholder="Preis (optional, z.B. ab 35 €)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
                 <input type="number" id="serviceDuration" data-i18n-ph="servDurationPh" placeholder="Dauer in Min (optional)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
                 <input type="text" id="serviceDesc" data-i18n-ph="servDescPh" placeholder="Kurze Beschreibung" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
                 <select id="serviceEmployee" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
@@ -910,7 +910,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             ['serviceCategory', 'newCategoryParent'].forEach(id => {
                 const sel = document.getElementById(id); if (!sel) return;
                 const keep = sel.value;
-                sel.innerHTML = (id === 'serviceCategory' ? '<option value="">Kategorie wählen…</option>' : '<option value="">— Hauptkategorie —</option>') +
+                sel.innerHTML = (id === 'serviceCategory' ? '<option value="">Kategorie wählen…</option>' : '<option value="">— Hauptkategorie (keine Unterkategorie) —</option>') +
                     sorted.map(p => `<option value="${esc(p)}">${esc(p.split(' > ').join(' → '))}</option>`).join('');
                 sel.value = keep;
             });
@@ -937,7 +937,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
                             <button onclick="removeService(${s.id})" class="text-red-400 hover:text-red-300" title="Löschen"><i class="fa-solid fa-trash"></i></button>
                         </div>` : ''}
                         <h4 class="font-bold text-gray-800 text-sm pr-14">${esc(s.title)}</h4>
-                        <p class="text-xs text-emerald-500 mt-0.5">${esc(s.price)} • ${esc(s.price)}${s.duration ? ' • ' + s.duration + ' Min' : ''} • ${esc(s.assignedTo)}</p>
+                        <p class="text-xs text-emerald-500 mt-0.5">${esc(s.price)} • ${[s.price ? esc(s.price) : '', s.duration ? s.duration + ' Min' : '', esc(s.assignedTo)].filter(Boolean).join(' • ')}</p>
                         <p class="text-xs text-gray-500 mt-2">${esc(s.desc)}</p>
                     </div>`).join('');
                 servList.innerHTML += `
@@ -1267,7 +1267,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             const desc = document.getElementById('serviceDesc').value.trim();
             const assignedTo = document.getElementById('serviceEmployee').value;
             const category = document.getElementById('serviceCategory').value.trim();
-            if (!title || !price) { alert('Bitte Titel und Preis eingeben.'); return; }
+            if (!title) { alert('Bitte einen Titel eingeben.'); return; }
 
             const { error } = await supa.from('services').insert({
                 title, price, duration, description: desc, assigned_to: assignedTo, category
@@ -1283,7 +1283,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
         async function editService(id) {
             const s = (storeData.services || []).find(x => x.id === id);
             if (!s) return;
-            const price = prompt('Neuer Preis für "' + s.title + '":', s.price);
+            const price = prompt('Preis für "' + s.title + '" (leer lassen = keine Angabe):', s.price || '');
             if (price === null) return;
             const duration = prompt('Dauer in Minuten (leer lassen = keine Angabe):', s.duration || '');
             if (duration === null) return;

@@ -174,7 +174,7 @@
             const serviceSelect = document.getElementById('bookingService');
             (storeData.services || []).forEach(s => {
                 const duration = s.duration || 30;
-                serviceSelect.innerHTML += `<option value="${s.title}" data-duration="${duration}" data-assigned="${s.assignedTo}">${s.title} (${s.price}${s.duration ? ' • ' + s.duration + ' Min' : ''})</option>`;
+                serviceSelect.innerHTML += `<option value="${s.title}" data-duration="${duration}" data-assigned="${s.assignedTo}">${s.title} ${[s.price, s.duration ? s.duration + ' Min' : ''].filter(Boolean).length ? ' (' + [s.price, s.duration ? s.duration + ' Min' : ''].filter(Boolean).join(' • ') + ')' : ''}</option>`;
             });
 
             // Pre-select service from URL (?service=...) when coming from the homepage

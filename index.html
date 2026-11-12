@@ -371,7 +371,7 @@
                         <div>
                             <div class="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-700">
                                 <span class="text-brand-600 dark:text-brand-400 font-bold text-sm">${esc(service.price)}</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400">${service.duration || 30} Min</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">${service.duration ? service.duration + ' Min' : ''}</span>
                             </div>
                             <span class="mt-3 inline-flex items-center gap-1 text-xs font-bold text-brand-600 group-hover:underline">${esc(translations[currentLang]?.cardBook || 'Jetzt buchen →')}</span>
                         </div>

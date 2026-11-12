@@ -1433,7 +1433,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
                             b.service + ' (' + b.employee + ')\n' +
                             fmtDate(b.date) + ', ' + b.time + ' Uhr · ' + (b.duration || 30) + ' Min\n\n' +
                             b.clientName + '\n' + b.clientPhone + '\n' + b.clientEmail +
-                            '\n\nDiesen Termin löschen?');
+                            '\n\nDiesen Termin stornieren? Der Kunde wird per E-Mail informiert.');
                         if (ok) await deleteBookingNoAsk(idx);
                     }
                 });
@@ -1444,13 +1444,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
         }
 
         async function deleteBookingNoAsk(index) {
-            const b = storeData.bookings[index];
-            if (b && b.id != null) {
-                const { error } = await supa.from('bookings').delete().eq('id', b.id);
-                if (error) { alert('Löschen fehlgeschlagen: ' + error.message); return; }
-            }
-            storeData.bookings.splice(index, 1);
-            renderDashboard();
+            await deleteBooking(index, true);
         }
 
         async function changeRole(index, role) {
@@ -1542,15 +1536,41 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             saveData();
         }
 
-        async function deleteBooking(index) {
+        const CANCEL_TEMPLATE = 'template_dggkman'; // <- your cancellation template ID
+
+        async function deleteBooking(index, skipAsk) {
             const b = storeData.bookings[index];
-            if (!await confirmDialog('Termin' + (b && b.clientName ? ' von ' + b.clientName : '') + ' wirklich löschen?')) return;
-            if (b && b.id != null) {
+            if (!b) return;
+            if (!skipAsk && !await confirmDialog('Termin von ' + (b.clientName || 'Kunde') + ' stornieren?\n' +
+                fmtDate(b.date) + ', ' + b.time + ' Uhr – ' + b.service +
+                '\n\nDer Termin wird gelöscht und der Kunde per E-Mail informiert.')) return;
+
+            const reason = (prompt('Grund für die Stornierung (optional, erscheint in der E-Mail):', '') || '').trim();
+
+            if (b.id != null) {
                 const { error } = await supa.from('bookings').delete().eq('id', b.id);
-                if (error) { alert('Löschen fehlgeschlagen: ' + error.message); return; }
+                if (error) { alert('Stornieren fehlgeschlagen: ' + error.message); return; }
             }
+
+            let mailOk = true;
+            if (b.clientEmail) {
+                try {
+                    await emailjs.send('service_98yq0nk', CANCEL_TEMPLATE, {
+                        client_name: b.clientName || '',
+                        client_email: b.clientEmail,
+                        service: b.service || '',
+                        employee: b.employee || '',
+                        date_display: fmtDate(b.date),
+                        time: b.time || '',
+                        reason: reason ? 'Grund: ' + reason : ''
+                    });
+                } catch (e) { mailOk = false; console.warn('cancel mail failed:', e); }
+            }
+
             storeData.bookings.splice(index, 1);
             renderDashboard();
+            if (!b.clientEmail) alert('Termin storniert. Keine E-Mail-Adresse vorhanden – bitte Kunde anrufen: ' + (b.clientPhone || ''));
+            else if (!mailOk) alert('Termin storniert, aber die E-Mail konnte nicht gesendet werden. Bitte Kunde anrufen: ' + (b.clientPhone || ''));
         }
     </script>
     <!-- Custom confirm dialog -->

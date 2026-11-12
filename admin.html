@@ -275,7 +275,8 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             <p class="text-xs text-gray-500 mb-6" data-i18n="servicesSub">Legen Sie fest, wie lange jede Behandlungsart dauert (z.B. 30 Min, 45 Min).</p>
             
             <div class="grid grid-cols-1 md:grid-cols-6 gap-3 mb-4">
-                <input type="text" id="serviceCategory" placeholder="Kategorie (z.B. Manicure)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
+                <input type="text" id="serviceCategory" list="categoryOptions" placeholder="Kategorie (z.B. Manicure by Natalie > Gel)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
+                <datalist id="categoryOptions"></datalist>
                 <input type="text" id="serviceTitle" data-i18n-ph="servTitlePh" placeholder="Titel (z.B. Maniküre)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:border-emerald-500">
                 <input type="text" id="servicePrice" data-i18n-ph="servPricePh" placeholder="Preis (z.B. ab 35,00 €)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
                 <input type="number" id="serviceDuration" data-i18n-ph="servDurationPh" placeholder="Dauer in Min (z.B. 45)" class="bg-white border border-green-200 rounded-xl p-3 text-sm text-black focus:outline-none focus:border-emerald-500">
@@ -881,23 +882,50 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             loadPhotoFields();
         }
 
-                function renderServices(isEmp, empName, lang) {
+        function renderServices(isEmp, empName, lang) {
             const servList = document.getElementById('servicesList');
             servList.innerHTML = '';
             const filtered = isEmp ? (storeData.services || []).filter(s => s.assignedTo === empName || s.assignedTo === 'Alle') : (storeData.services || []);
 
+            // Category suggestions: every path and all its parent levels
+            const paths = new Set();
+            (storeData.services || []).forEach(s => {
+                const parts = catParts(s.category);
+                parts.forEach((_, i) => paths.add(parts.slice(0, i + 1).join(' > ')));
+            });
+            const dl = document.getElementById('categoryOptions');
+            if (dl) dl.innerHTML = [...paths].sort().map(p => `<option value="${esc(p)}">`).join('');
+
+            // Group by full category path
+            const groups = {};
             filtered.forEach(s => {
-                servList.innerHTML += `
+                const key = catParts(s.category).join(' > ') || 'Ohne Kategorie';
+                (groups[key] = groups[key] || []).push(s);
+            });
+
+            Object.keys(groups).sort().forEach(key => {
+                const depth = key.split(' > ').length - 1;
+                const cards = groups[key].map(s => `
                     <div class="p-4 bg-white border border-green-200 rounded-xl relative">
                         ${(!isEmp || s.assignedTo === empName) ? `<div class="absolute top-3 right-3 flex gap-3">
                             <button onclick="editService(${s.id})" class="text-sky-500 hover:text-sky-400" title="Bearbeiten"><i class="fa-solid fa-pen"></i></button>
                             <button onclick="removeService(${s.id})" class="text-red-400 hover:text-red-300" title="Löschen"><i class="fa-solid fa-trash"></i></button>
                         </div>` : ''}
-                        <h4 class="font-bold text-gray-800 text-sm">${s.title}</h4>
-                        <p class="text-xs text-emerald-400 mt-0.5">${s.price} • ${s.duration || 30} Min</p>
-                        <p class="text-xs text-gray-500 mt-2">${s.desc}</p>
+                        <h4 class="font-bold text-gray-800 text-sm pr-14">${esc(s.title)}</h4>
+                        <p class="text-xs text-emerald-500 mt-0.5">${esc(s.price)} • ${s.duration || 30} Min • ${esc(s.assignedTo)}</p>
+                        <p class="text-xs text-gray-500 mt-2">${esc(s.desc)}</p>
+                    </div>`).join('');
+                servList.innerHTML += `
+                    <div class="md:col-span-2" style="margin-left:${depth * 16}px">
+                        <h3 class="text-sm font-bold text-emerald-600 mb-2"><i class="fa-solid fa-folder-open mr-1"></i> ${esc(key.split(' > ').join(' → '))}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">${cards}</div>
                     </div>`;
             });
+        }
+
+        // "A > B > C" -> ['A','B','C'] (trims spaces, drops empty parts)
+        function catParts(c) {
+            return String(c || '').split('>').map(x => x.trim()).filter(Boolean);
         }
 
                 function renderBlockedPeriods(isEmp, empName, lang) {
@@ -1211,9 +1239,21 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             if (price === null) return;
             const duration = prompt('Dauer in Minuten:', s.duration);
             if (duration === null) return;
+            const title = prompt('Name der Leistung:', s.title);
+            if (title === null) return;
+            const desc = prompt('Beschreibung:', s.desc);
+            if (desc === null) return;
+            const category = prompt('Kategorie (Unterkategorie mit > trennen, z.B. Manicure by Natalie > Gel):', s.category || '');
+            if (category === null) return;
 
             const { error } = await supa.from('services')
-                .update({ price: price.trim(), duration: parseInt(duration) || s.duration })
+                .update({
+                    price: price.trim(),
+                    duration: parseInt(duration) || s.duration,
+                    title: title.trim() || s.title,
+                    description: desc.trim(),
+                    category: catParts(category).join(' > ')
+                })
                 .eq('id', id);
             if (error) { alert('Ändern fehlgeschlagen: ' + error.message); return; }
             await loadServicesFromCloud();

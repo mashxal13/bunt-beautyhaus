@@ -131,6 +131,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
                 <h1 class="text-2xl font-bold font-serif text-white">BUNT Admin Dashboard</h1>
                 <p id="welcomeSubtitle" class="text-xs text-gray-500" data-i18n="dashboardSub">Verwaltung, Arbeitszeiten & Buchungen</p>
             </div>
+            <button onclick="openMyProfile()" class="px-4 py-2 mr-2 bg-white border border-green-200 hover:bg-green-50 text-emerald-600 font-bold text-xs rounded-xl"><i class="fa-solid fa-id-card mr-1"></i> Mein Profil</button>
             <button onclick="logoutAdmin()" class="px-4 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold hover:bg-red-500/20">
                 <i class="fa-solid fa-sign-out-alt mr-1"></i> <span data-i18n="logoutBtn">Abmelden</span>
             </button>
@@ -822,6 +823,7 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
                     <li class="flex justify-between items-center bg-white p-3 rounded-xl border border-green-200 text-xs">
                         <span class="flex items-center gap-2"><b>${emp}</b>${(storeData.employeeEmails||{})[emp] ? ` <span class="text-gray-400">(${storeData.employeeEmails[emp]})</span>` : ''}${empStatus[emp] ? ` <span class="ml-1 px-1.5 py-0.5 rounded ${empStatus[emp]==='aktiv' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${empStatus[emp]}</span>` : ''}</span>
                         ${!isEmp ? `<span class="flex items-center gap-3">
+                            <button onclick="openProfile(${index})" class="text-emerald-500 hover:text-emerald-400" title="Profil"><i class="fa-solid fa-id-card"></i></button>
                             ${empSelf[emp] ? '<span class="px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">Admin (Sie)</span>' : `
                             <select onchange="changeRole(${index}, this.value)" class="border border-green-200 rounded-lg p-1 text-xs">
                                 <option value="employee" ${empRole[emp] !== 'admin' ? 'selected' : ''}>Mitarbeiter</option>
@@ -1447,6 +1449,51 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             await deleteBooking(index, true);
         }
 
+        let profileEmail = null;
+        const pfFields = { pfBirthday: 'birthday', pfPhone: 'phone', pfStreet: 'street', pfZip: 'zip', pfCity: 'city',
+                           pfEmName: 'emergency_name', pfEmRel: 'emergency_relation', pfEmPhone: 'emergency_phone' };
+
+        function openProfile(index) {
+            const name = storeData.employees[index];
+            const email = (storeData.employeeEmails || {})[name];
+            if (!email) { alert('Keine E-Mail für ' + name + ' gefunden.'); return; }
+            showProfile(name, email);
+        }
+
+        async function openMyProfile() {
+            const { data } = await supa.auth.getSession();
+            const u = data.session && data.session.user;
+            if (!u) return;
+            showProfile((storeData.currentUser || {}).name || '', u.email);
+        }
+
+        async function showProfile(name, email) {
+            profileEmail = email.toLowerCase();
+            document.getElementById('pfName').textContent = name;
+            document.getElementById('pfEmail').textContent = email;
+            document.getElementById('pfMsg').textContent = '';
+            Object.keys(pfFields).forEach(id => document.getElementById(id).value = '');
+            const { data, error } = await supa.from('team_profiles').select('*').eq('email', profileEmail).maybeSingle();
+            if (error) { alert('Profil konnte nicht geladen werden: ' + error.message); return; }
+            if (data) Object.keys(pfFields).forEach(id => document.getElementById(id).value = data[pfFields[id]] || '');
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+
+        function closeProfile() {
+            document.getElementById('profileModal').classList.add('hidden');
+            profileEmail = null;
+        }
+
+        async function saveProfile() {
+            if (!profileEmail) return;
+            const row = { email: profileEmail, updated_at: new Date().toISOString() };
+            Object.keys(pfFields).forEach(id => { row[pfFields[id]] = document.getElementById(id).value.trim() || null; });
+            const msg = document.getElementById('pfMsg');
+            const { error } = await supa.from('team_profiles').upsert(row);
+            if (error) { msg.textContent = 'Fehler: ' + error.message; msg.className = 'text-xs self-center mr-auto text-red-500'; return; }
+            msg.textContent = 'Gespeichert ✓'; msg.className = 'text-xs self-center mr-auto text-emerald-600';
+        }
+
         async function changeRole(index, role) {
             const name = storeData.employees[index];
             const email = (storeData.employeeEmails || {})[name];
@@ -1573,6 +1620,45 @@ const clean = Object.assign({}, obj); delete clean.currentUser; delete clean.adm
             else if (!mailOk) alert('Termin storniert, aber die E-Mail konnte nicht gesendet werden. Bitte Kunde anrufen: ' + (b.clientPhone || ''));
         }
     </script>
+    <!-- Team profile modal -->
+    <div id="profileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div class="bg-white border border-green-200 rounded-2xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-id-card text-emerald-500 mr-2"></i><span id="pfName"></span></h3>
+                    <p id="pfEmail" class="text-xs text-gray-500"></p>
+                </div>
+                <button onclick="closeProfile()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div><label class="block text-xs text-gray-500 mb-1">Geburtstag</label>
+                    <input type="date" id="pfBirthday" class="w-full bg-white border border-green-200 rounded-xl p-3 text-black focus:outline-none focus:border-emerald-500"></div>
+                <div><label class="block text-xs text-gray-500 mb-1">Telefon</label>
+                    <input type="tel" id="pfPhone" maxlength="30" class="w-full bg-white border border-green-200 rounded-xl p-3 text-black focus:outline-none focus:border-emerald-500"></div>
+                <div class="md:col-span-2"><label class="block text-xs text-gray-500 mb-1">Straße & Hausnummer</label>
+                    <input type="text" id="pfStreet" maxlength="120" class="w-full bg-white border border-green-200 rounded-xl p-3 text-black focus:outline-none focus:border-emerald-500"></div>
+                <div><label class="block text-xs text-gray-500 mb-1">PLZ</label>
+                    <input type="text" id="pfZip" maxlength="10" class="w-full bg-white border border-green-200 rounded-xl p-3 text-black focus:outline-none focus:border-emerald-500"></div>
+                <div><label class="block text-xs text-gray-500 mb-1">Ort</label>
+                    <input type="text" id="pfCity" maxlength="80" class="w-full bg-white border border-green-200 rounded-xl p-3 text-black focus:outline-none focus:border-emerald-500"></div>
+            </div>
+            <h4 class="text-sm font-bold text-red-500 mt-5 mb-2"><i class="fa-solid fa-truck-medical mr-1"></i> Notfallkontakt</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                <div><label class="block text-xs text-gray-500 mb-1">Name</label>
+                    <input type="text" id="pfEmName" maxlength="80" class="w-full bg-white border border-green-200 rounded-xl p-3 text-black focus:outline-none focus:border-emerald-500"></div>
+                <div><label class="block text-xs text-gray-500 mb-1">Beziehung</label>
+                    <input type="text" id="pfEmRel" maxlength="40" placeholder="z.B. Ehemann, Mutter" class="w-full bg-white border border-green-200 rounded-xl p-3 text-black focus:outline-none focus:border-emerald-500"></div>
+                <div><label class="block text-xs text-gray-500 mb-1">Telefon</label>
+                    <input type="tel" id="pfEmPhone" maxlength="30" class="w-full bg-white border border-green-200 rounded-xl p-3 text-black focus:outline-none focus:border-emerald-500"></div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <span id="pfMsg" class="text-xs self-center mr-auto"></span>
+                <button onclick="closeProfile()" class="px-5 py-2.5 bg-white border border-green-200 hover:bg-green-50 text-gray-600 font-bold text-xs rounded-xl">Schließen</button>
+                <button onclick="saveProfile()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl">Speichern</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom confirm dialog -->
     <div id="confirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
         <div class="bg-white border border-green-200 rounded-2xl shadow-xl max-w-md w-full p-6">
